@@ -171,5 +171,8 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+TELEGRAM_BOT_TOKEN = '1155985628:AAEzVNBpXFz4hRFqIIggt6f7FuObRP8PxLQ'
+
+
 # SPDX-License-Identifier: (EUPL-1.2)
 # Copyright © 2020 miraculix-org Florian Kleber
