@@ -6,4 +6,4 @@ class CoreConfig(AppConfig):
     name = 'core'
 
 # SPDX-License-Identifier: (EUPL-1.2)
-# Copyright © 2019 Werbeagentur Christian Aichner
+# Copyright © 2020 miraculix-org Florian Kleber

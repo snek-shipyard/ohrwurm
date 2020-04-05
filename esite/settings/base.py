@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 INSTALLED_APPS = [
     # Our own apps
     'esite.core',
-    'esite.home',
+    'esite.flow-breaker',
 
     # Third party apps
     'corsheaders',
@@ -171,4 +171,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # SPDX-License-Identifier: (EUPL-1.2)
-# Copyright © 2019 Werbeagentur Christian Aichner
+# Copyright © 2020 miraculix-org Florian Kleber
