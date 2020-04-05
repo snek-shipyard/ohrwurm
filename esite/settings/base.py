@@ -23,11 +23,12 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 INSTALLED_APPS = [
     # Our own apps
     'esite.core',
-    'esite.flow-breaker',
+    'esite.flow_breaker',
 
     # Third party apps
     'corsheaders',
     'django_filters',
+
 
     # Django core apps
     'django.contrib.admin',
