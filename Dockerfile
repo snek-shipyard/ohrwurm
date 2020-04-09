@@ -38,7 +38,7 @@ RUN echo "## Installing base ##" && \
         make \
         libc-dev \
         musl-dev \
-	libffi-dev
+	libffi-dev \
         linux-headers \
         pcre-dev \
         postgresql-dev \
