@@ -38,6 +38,7 @@ RUN echo "## Installing base ##" && \
         make \
         libc-dev \
         musl-dev \
+	libffi-dev
         linux-headers \
         pcre-dev \
         postgresql-dev \
@@ -46,12 +47,12 @@ RUN echo "## Installing base ##" && \
         expat-dev \
 	;\
     apk add --force \
-		git@main \
-		bash@main \
-		libjpeg-turbo@main \
-		pcre@main \
+	git@main \
+	bash@main \
+	libjpeg-turbo@main \
+	pcre@main \
         ffmpeg@main \
-		postgresql-client@main \
+	postgresql-client@main \
         tini@community \
 	\
 	&& python -m venv /venv \
