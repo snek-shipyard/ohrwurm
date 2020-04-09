@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 INSTALLED_APPS = [
     # Our own apps
     'esite.core',
-    'esite.flow_breaker',
+    'esite.waveater',
 
     # Third party apps
     'corsheaders',
@@ -170,8 +170,6 @@ STATIC_URL = '/static/'
 # See https://docs.djangoproject.com/en/2.2/ref/settings/#media-root
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-
-TELEGRAM_BOT_TOKEN = '1155985628:AAEzVNBpXFz4hRFqIIggt6f7FuObRP8PxLQ'
 
 
 # SPDX-License-Identifier: (EUPL-1.2)

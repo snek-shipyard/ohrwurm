@@ -50,6 +50,7 @@ RUN echo "## Installing base ##" && \
 		bash@main \
 		libjpeg-turbo@main \
 		pcre@main \
+        ffmpeg@main \
 		postgresql-client@main \
         tini@community \
 	\
@@ -57,11 +58,11 @@ RUN echo "## Installing base ##" && \
 	&& /venv/bin/pip install -U pip \
 	&& LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "/venv/bin/pip install -r /requirements/production.txt" \
 	&& runDeps="$( \
-	    scanelf --needed --nobanner --recursive /venv \
-	        | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-	        | sort -u \
-	        | xargs -r apk info --installed \
-	        | sort -u \
+		scanelf --needed --nobanner --recursive /venv \
+			| awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+			| sort -u \
+			| xargs -r apk info --installed \
+			| sort -u \
 	)" \
 	&& apk add --virtual .python-rundeps $runDeps \
 	&& apk del .build-deps \

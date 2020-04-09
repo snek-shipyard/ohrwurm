@@ -61,5 +61,12 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
 
+#> Telegram backend
+# The backend to use for sending telegrams.
+TELEGRAM_API_ID = os.getenv('TELEGRAM_API_ID', '')
+TELEGRAM_API_HASH = os.getenv('TELEGRAM_API_HASH', '')
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
+
+
 # SPDX-License-Identifier: (EUPL-1.2)
 # Copyright © 2020 miraculix-org Florian Kleber
