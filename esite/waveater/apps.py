@@ -37,6 +37,12 @@ class Waveater():
             await event.respond("Hi, I'm an audio slave! :3\nI would love to convert every wav you got into a telegram voice message. (>.<)")
             raise events.StopPropagation
 
+        @client.on(events.NewMessage(pattern='/motivation'))
+        async def start(event):
+            """Send a message when the command /start is issued."""
+            await event.respond("OMG! Senpai, *o* let me convewt some wav into telegwam voice message, ~Nyaaaa")
+            raise events.StopPropagation
+
         @client.on(events.NewMessage)
         async def echo(event):
             """Echo the user message."""
