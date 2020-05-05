@@ -23,7 +23,9 @@ class WaveaterConfig(AppConfig):
     def ready(self):
         """Start the client."""
         print("waveaterbot started...")
-        threading.Thread(name="waveater-main-thread", target=Waveater.main).start()
+        waveater_thread = threading.Thread(name="waveater-main-thread", target=Waveater.main)
+        waveater_thread.daemon = False  # -> dies after main thread is closed
+        waveater_thread.start()
 
 
 class Waveater():
