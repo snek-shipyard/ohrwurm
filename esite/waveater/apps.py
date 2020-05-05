@@ -21,9 +21,14 @@ class WaveaterConfig(AppConfig):
     name = 'esite.flow_breaker'
 
     def ready(self):
-        """Start the client."""
-        print("waveaterbot started...")
-        threading.Thread(name="waveater-main-thread", target=Waveater.main).start()
+        try:
+            """Start the client."""
+            waveater_thread = threading.Thread(name="waveater-main-thread", target=Waveater.main)
+            waveater_thread.daemon = True  # -> dies after main thread is closed
+            waveater_thread.start()
+        finally:
+            print("waveaterbot started...")
+
 
 class Waveater():
     def main():
@@ -82,7 +87,8 @@ class Waveater():
                     await msg.edit(f"OwO Shit happens! Something has gone wrong.\n\n**Error:** {e}")
 
         #print(f"{threading.enumerate()}")
-        client.run_until_disconnected()
+        with client:
+            client.run_until_disconnected()
 
 # SPDX-License-Identifier: (EUPL-1.2)
 # Copyright © 2020 miraculix-org Florian Kleber
