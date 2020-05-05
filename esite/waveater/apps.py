@@ -24,7 +24,7 @@ class WaveaterConfig(AppConfig):
         """Start the client."""
         print("waveaterbot started...")
         waveater_thread = threading.Thread(name="waveater-main-thread", target=Waveater.main)
-        waveater_thread.daemon = False  # -> dies after main thread is closed
+        waveater_thread.daemon = True  # -> dies after main thread is closed
         waveater_thread.start()
 
 
