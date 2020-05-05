@@ -21,13 +21,9 @@ class WaveaterConfig(AppConfig):
     name = 'esite.flow_breaker'
 
     def ready(self):
-        try:
-            """Start the client."""
-            waveater_thread = threading.Thread(name="waveater-main-thread", target=Waveater.main)
-            waveater_thread.daemon = True  # -> dies after main thread is closed
-            waveater_thread.start()
-        finally:
-            print("waveaterbot started...")
+        """Start the client."""
+        print("waveaterbot started...")
+        threading.Thread(name="waveater-main-thread", target=Waveater.main).start()
 
 
 class Waveater():
