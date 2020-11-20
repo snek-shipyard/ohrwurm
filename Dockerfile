@@ -38,7 +38,6 @@ RUN echo "## Installing base ##" && \
         make \
         libc-dev \
         musl-dev \
-	libffi-dev \
         linux-headers \
         pcre-dev \
         postgresql-dev \
@@ -47,23 +46,22 @@ RUN echo "## Installing base ##" && \
         expat-dev \
 	;\
     apk add --force \
-	git@main \
-	bash@main \
-	libjpeg-turbo@main \
-	pcre@main \
-        ffmpeg@main \
-	postgresql-client@main \
+		git@main \
+		bash@main \
+		libjpeg-turbo@main \
+		pcre@main \
+		postgresql-client@main \
         tini@community \
 	\
 	&& python -m venv /venv \
 	&& /venv/bin/pip install -U pip \
 	&& LIBRARY_PATH=/lib:/usr/lib /bin/sh -c "/venv/bin/pip install -r /requirements/production.txt" \
 	&& runDeps="$( \
-		scanelf --needed --nobanner --recursive /venv \
-			| awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-			| sort -u \
-			| xargs -r apk info --installed \
-			| sort -u \
+	    scanelf --needed --nobanner --recursive /venv \
+	        | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+	        | sort -u \
+	        | xargs -r apk info --installed \
+	        | sort -u \
 	)" \
 	&& apk add --virtual .python-rundeps $runDeps \
 	&& apk del .build-deps \
@@ -96,4 +94,4 @@ CMD ["/venv/bin/uwsgi", "--http-auto-chunked", \
 ]
 
 # SPDX-License-Identifier: (EUPL-1.2)
-# Copyright © 2020 miraculix-org Florian Kleber
+# Copyright © 2019-2020 Simon Prast

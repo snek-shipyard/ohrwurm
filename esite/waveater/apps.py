@@ -18,7 +18,7 @@ from pydub import AudioSegment
 
 
 class WaveaterConfig(AppConfig):
-    name = 'esite.flow_breaker'
+    name = 'esite.waveater'
 
     def ready(self):
         """Start the client."""

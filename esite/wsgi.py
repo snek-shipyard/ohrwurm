@@ -11,9 +11,9 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'esite.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "esite.settings.production")
 
 application = get_wsgi_application()
 
 # SPDX-License-Identifier: (EUPL-1.2)
-# Copyright © 2020 miraculix-org Florian Kleber
+# Copyright © 2019-2020 Simon Prast

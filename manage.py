@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
@@ -18,8 +17,8 @@ def main():
     execute_from_command_line(sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
 # SPDX-License-Identifier: (EUPL-1.2)
-# Copyright © 2020 miraculix-org Florian Kleber
+# Copyright © 2019-2020 Simon Prast
