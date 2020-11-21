@@ -66,6 +66,17 @@ def register_query_field(field_name, plural_field_name=None, query_params=None):
                 if issubclass(cls, Page):
                     qs = cls.objects.live().public().order_by("-first_published_at")
 
+                # Filter queryset for field_query_params
+                # Important: each field_query_param must be indexed in the model:
+                # index.FilterField("field_query_param")
+                qs = qs.filter(
+                    **{
+                        key: kwargs.get(key)
+                        for (key, value) in field_query_params.items()
+                        if key is not "id"
+                    }
+                )
+
                 return resolve_queryset(qs.all(), info, **kwargs)
 
             # Create schema and add resolve methods
@@ -145,6 +156,17 @@ def register_paginated_query_field(
                 if issubclass(cls, Page):
                     qs = qs.live().public().order_by("-first_published_at")
 
+                # Filter queryset for field_query_params
+                # Important: each field_query_param must be indexed in the model:
+                # index.FilterField("field_query_param")
+                qs = qs.filter(
+                    **{
+                        key: kwargs.get(key)
+                        for (key, value) in field_query_params.items()
+                        if key is not "id"
+                    }
+                )
+
                 return resolve_paginated_queryset(qs.all(), info, **kwargs)
 
             # Create schema and add resolve methods
@@ -167,7 +189,12 @@ def register_paginated_query_field(
             setattr(
                 schema,
                 plural_field_name,
-                PaginatedQuerySet(plural_field_type, cls, required=plural_required),
+                PaginatedQuerySet(
+                    plural_field_type,
+                    cls,
+                    required=plural_required,
+                    **field_query_params
+                ),
             )
 
             setattr(
