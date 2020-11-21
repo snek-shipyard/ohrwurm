@@ -175,6 +175,8 @@ BIFROST_APPS = {
     "utils": "",
 }
 
+BIFROST_ADD_SEARCH_HIT = True
+
 # > Password Validation
 # The list of validators that are used to check the strength of passwords, see
 # https://docs.djangoproject.com/en/stable/ref/settings/#auth-password-validators

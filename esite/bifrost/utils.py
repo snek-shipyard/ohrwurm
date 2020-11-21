@@ -139,7 +139,7 @@ def resolve_paginated_queryset(
         if not class_is_indexed(qs.model):
             raise TypeError("This data type is not searchable by Wagtail.")
 
-        if settings.GRAPPLE_ADD_SEARCH_HIT is True:
+        if settings.BIFROST_ADD_SEARCH_HIT is True:
             query = Query.get(search_query)
             query.add_hit()
 
