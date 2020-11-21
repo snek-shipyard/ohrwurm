@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "esite.search",
     # Our own pages
     "esite.home",
+    "esite.track",
     # Django core apps
     "django.contrib.admin",
     "django.contrib.auth",
@@ -165,6 +166,7 @@ GRAPHQL_JWT = {
 
 BIFROST_APPS = {
     "home": "",
+    "track": "",
     "utils": "",
     "documents": "",
     "images": "",
