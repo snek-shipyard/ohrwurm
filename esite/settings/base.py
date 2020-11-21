@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     "esite.search",
     # Our own pages
     "esite.home",
-    "esite.waveater",
     # Django core apps
     "django.contrib.admin",
     "django.contrib.auth",
@@ -60,8 +59,6 @@ INSTALLED_APPS = [
     "wagtail.admin",
     "wagtail.core",
     # Third party apps
-    "pydub",
-    "telethon",
     "corsheaders",
     "django_filters",
     "modelcluster",

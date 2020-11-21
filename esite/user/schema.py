@@ -54,6 +54,19 @@ class Query(graphene.ObjectType):
         except get_user_model().DoesNotExist:
             return False
 
+    # @superuser_required
+    # def resolve_users(self, info, **_kwargs):
+
+    #     return get_user_model().objects.all()
+
+    # @login_required
+    # def resolve_user(self, info, username, **_kwargs):
+    #     print(username)
+    #     user = get_user_model().objects.get(username=username)
+    #     print(user.__dict__)
+
+    #     return user
+
     @login_required
     def resolve_me(self, info, **_kwargs):
         user = info.context.user

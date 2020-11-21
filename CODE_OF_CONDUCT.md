@@ -4,12 +4,12 @@
   </a>
 </p>
 
-<h3 align="center">Official code of conflict</h3>
+<h3 align="center">Official Code of Conflict</h3>
 
 ## Table of contents
 
-- [Table of contents](#table-of-contents)
-- [Conflicts](#conflicts)
+-   [Table of contents](#table-of-contents)
+-   [Conflicts](#conflicts)
 
 ## [](#conflicts)Conflicts
 
