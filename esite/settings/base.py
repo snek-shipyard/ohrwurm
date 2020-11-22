@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "esite.search",
     # Our own pages
     "esite.home",
+    "esite.track",
     # Django core apps
     "django.contrib.admin",
     "django.contrib.auth",
@@ -89,7 +90,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Wagtail core middleware
-    "wagtail.core.middleware.SiteMiddleware",
+    "wagtail.contrib.legacy.sitemiddleware.SiteMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
     # Third party middleware
     "corsheaders.middleware.CorsMiddleware",
@@ -165,6 +166,7 @@ GRAPHQL_JWT = {
 
 BIFROST_APPS = {
     "home": "",
+    "track": "",
     "utils": "",
     "documents": "",
     "images": "",
@@ -172,6 +174,8 @@ BIFROST_APPS = {
     "navigation": "",
     "utils": "",
 }
+
+BIFROST_ADD_SEARCH_HIT = True
 
 # > Password Validation
 # The list of validators that are used to check the strength of passwords, see
