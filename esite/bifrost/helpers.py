@@ -7,6 +7,14 @@ import graphene
 
 from .registry import registry
 from .types.streamfield import StreamFieldInterface
+from functools import wraps
+from graphql_jwt.decorators import (
+    login_required,
+    permission_required,
+    staff_member_required,
+    superuser_required,
+)
+from graphql.execution.base import ResolveInfo
 
 streamfield_types = []
 
@@ -119,20 +127,26 @@ def register_paginated_query_field(
     def inner(cls):
         field_type = lambda: registry.models[cls]
         field_query_params = query_params
-        if field_query_params is None:
-            field_query_params = {"id": graphene.Int()}
 
-            if issubclass(cls, Page):
-                field_query_params["slug"] = graphene.Argument(
-                    graphene.String, description=ugettext_lazy("The page slug.")
-                )
-                field_query_params["token"] = graphene.Argument(
-                    graphene.String, description=ugettext_lazy("The preview token.")
-                )
+        field_query_params = query_params or {"id": graphene.Int()}
+
+        if issubclass(cls, Page):
+            field_query_params["slug"] = graphene.Argument(
+                graphene.String, description=ugettext_lazy("The page slug.")
+            )
+            field_query_params["token"] = graphene.Argument(
+                graphene.String, description=ugettext_lazy("The preview token.")
+            )
 
         def Mixin():
             # Generic methods to get all and query one model instance.
+            # @test(cls)
             def resolve_singular(self, _, info, **kwargs):
+                if hasattr(cls, "bifrost_queryset"):
+                    qs = cls.bifrost_queryset(info, **kwargs)
+                else:
+                    qs = cls.objects
+
                 # If no filters then return nothing.
                 if not kwargs:
                     return None
@@ -145,14 +159,18 @@ def register_paginated_query_field(
                         ):
                             return cls.get_page_from_preview_token(kwargs["token"])
 
-                        return cls.objects.live().public().get(**kwargs)
+                        return qs.live().public().get(**kwargs)
 
-                    return cls.objects.get(**kwargs)
+                    return qs.get(**kwargs)
                 except:
                     return None
 
             def resolve_plural(self, _, info, **kwargs):
-                qs = cls.objects
+                if hasattr(cls, "bifrost_queryset"):
+                    qs = cls.bifrost_queryset(info, **kwargs)
+                else:
+                    qs = cls.objects
+
                 if issubclass(cls, Page):
                     qs = qs.live().public().order_by("-first_published_at")
 
