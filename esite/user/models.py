@@ -49,6 +49,9 @@ class SNEKUser(AbstractUser, ClusterableModel):
         unique=True,
         validators=[django.contrib.auth.validators.UnicodeUsernameValidator()],
     )
+    telegram_user_id = models.CharField(
+        null=True, blank=True, unique=True, max_length=250
+    )
 
     # Custom save function
     def save(self, *args, **kwargs):
@@ -74,11 +77,27 @@ class SNEKUser(AbstractUser, ClusterableModel):
 
     panels = [
         FieldPanel("username"),
-        FieldPanel("first_name"),
-        FieldPanel("last_name"),
-        FieldPanel("email"),
-        FieldPanel("is_staff"),
-        FieldPanel("is_active"),
+        MultiFieldPanel(
+            [
+                FieldPanel("first_name"),
+                FieldPanel("last_name"),
+                FieldPanel("email"),
+            ],
+            "Information",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("is_staff"),
+                FieldPanel("is_active"),
+            ],
+            "Settings",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("telegram_user_id"),
+            ],
+            "Telegram",
+        ),
     ]
 
     graphql_fields = [

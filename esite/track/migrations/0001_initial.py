@@ -14,42 +14,115 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('images', '0002_auto_20201027_2246'),
+        ("images", "0002_auto_20201027_2246"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ProjectAudioChannel',
+            name="ProjectAudioChannel",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=250, null=True)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('channel_id', models.CharField(max_length=250, null=True)),
-                ('avatar_image', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='images.SNEKImage')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=250, null=True)),
+                ("description", models.TextField(blank=True, null=True)),
+                ("channel_id", models.CharField(max_length=250, null=True)),
+                (
+                    "avatar_image",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to="images.SNEKImage",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Track',
+            name="Track",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('title', models.CharField(max_length=250, null=True)),
-                ('audio_file', models.FileField(blank=True, upload_to='tracks/', validators=[esite.track.validators.validate_audio_file])),
-                ('audio_channel', models.CharField(blank=True, max_length=250, null=True)),
-                ('audio_format', models.CharField(blank=True, max_length=250, null=True)),
-                ('audio_codec', models.CharField(blank=True, max_length=250, null=True)),
-                ('audio_bitrate', models.CharField(blank=True, max_length=250, null=True)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('tags', wagtail.core.fields.StreamField([('tag', wagtail.core.blocks.StructBlock([('name', wagtail.core.blocks.CharBlock(max_length=16, required=True))], icon='tag', required=True))], blank=True)),
-                ('transcript', models.TextField(blank=True, null=True)),
-                ('pac', modelcluster.fields.ParentalKey(on_delete=django.db.models.deletion.CASCADE, related_name='tracks', to='track.ProjectAudioChannel')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("title", models.CharField(max_length=250, null=True)),
+                (
+                    "audio_file",
+                    models.FileField(
+                        blank=True,
+                        upload_to="tracks/",
+                        validators=[esite.track.validators.validate_audio_file],
+                    ),
+                ),
+                (
+                    "audio_channel",
+                    models.CharField(blank=True, max_length=250, null=True),
+                ),
+                (
+                    "audio_format",
+                    models.CharField(blank=True, max_length=250, null=True),
+                ),
+                (
+                    "audio_codec",
+                    models.CharField(blank=True, max_length=250, null=True),
+                ),
+                (
+                    "audio_bitrate",
+                    models.CharField(blank=True, max_length=250, null=True),
+                ),
+                ("description", models.TextField(blank=True, null=True)),
+                (
+                    "tags",
+                    wagtail.core.fields.StreamField(
+                        [
+                            (
+                                "tag",
+                                wagtail.core.blocks.StructBlock(
+                                    [
+                                        (
+                                            "name",
+                                            wagtail.core.blocks.CharBlock(
+                                                max_length=16, required=True
+                                            ),
+                                        )
+                                    ],
+                                    icon="tag",
+                                    required=True,
+                                ),
+                            )
+                        ],
+                        blank=True,
+                    ),
+                ),
+                ("transcript", models.TextField(blank=True, null=True)),
+                (
+                    "pac",
+                    modelcluster.fields.ParentalKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="tracks",
+                        to="track.ProjectAudioChannel",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
             bases=(wagtail.search.index.Indexed, models.Model),
         ),

@@ -6,7 +6,7 @@ from wagtail.core.fields import StreamField
 from esite.utils.models import TimeStampMixin
 from .blocks import TagBlock
 from modelcluster.models import ClusterableModel
-from modelcluster.fields import ParentalKey
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from esite.bifrost.helpers import register_paginated_query_field
 from esite.bifrost.models import (
     GraphQLCollection,
@@ -25,8 +25,15 @@ from wagtail.admin.edit_handlers import (
     TabbedInterface,
 )
 import graphene
-
+from graphql_jwt.decorators import (
+    login_required,
+    permission_required,
+    staff_member_required,
+    superuser_required,
+)
 from .validators import validate_audio_file
+
+from django.contrib.auth import get_user_model
 
 
 @register_paginated_query_field("project_audio_channel")
@@ -41,19 +48,30 @@ class ProjectAudioChannel(ClusterableModel):
         related_name="+",
         on_delete=models.SET_NULL,
     )
+    users = ParentalManyToManyField(
+        get_user_model(), related_name="tracks", null=True, blank=True
+    )
 
     graphql_fields = [
         GraphQLString("title"),
         GraphQLString("description"),
         GraphQLString("channel_id"),
         GraphQLImage("avatar_image"),
+        GraphQLCollection(GraphQLForeignKey, "users", get_user_model()),
     ]
+
+    def __str__(self):
+        return f"{self.title}"
+
+    @classmethod
+    @login_required
+    def bifrost_queryset(cls, info, **kwargs):
+        return cls.objects.filter(users=info.context.user)
 
 
 @register_paginated_query_field(
     "track",
-    "tracks",
-    {
+    query_params={
         "id": graphene.Int(),
         "pac": graphene.Int(),
     },
@@ -73,9 +91,6 @@ class Track(index.Indexed, TimeStampMixin):
     pac = ParentalKey(
         "ProjectAudioChannel", related_name="tracks", on_delete=models.CASCADE
     )
-
-    def audio_file_url(self, info, **kwargs):
-        return "%s%s" % (settings.BASE_URL, self.audio_file.url)
 
     graphql_fields = [
         GraphQLString("title"),
@@ -110,6 +125,17 @@ class Track(index.Indexed, TimeStampMixin):
         FieldPanel("transcript"),
         FieldPanel("pac"),
     ]
+
+    def audio_file_url(self, info, **kwargs):
+        return "%s%s" % (settings.BASE_URL, self.audio_file.url)
+
+    def __str__(self):
+        return f"{self.title}"
+
+    @classmethod
+    @login_required
+    def bifrost_queryset(cls, info, **kwargs):
+        return cls.objects.filter(pac__users=info.context.user)
 
 
 # SPDX-License-Identifier: (EUPL-1.2)
