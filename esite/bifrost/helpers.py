@@ -81,7 +81,7 @@ def register_query_field(field_name, plural_field_name=None, query_params=None):
                     **{
                         key: kwargs.get(key)
                         for (key, value) in field_query_params.items()
-                        if key is not "id" and key in kwargs
+                        if key not in ["id", "token"] and key in kwargs
                     }
                 )
 
@@ -181,7 +181,7 @@ def register_paginated_query_field(
                     **{
                         key: kwargs.get(key)
                         for (key, value) in field_query_params.items()
-                        if key is not "id" and key in kwargs
+                        if key not in ["id", "token"] and key in kwargs
                     }
                 )
 

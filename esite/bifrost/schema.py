@@ -40,6 +40,7 @@ def create_schema():
 
     class Query(
         # Custom queries end
+        esite.user.schema.Query,
         graphene.ObjectType,
         SearchQuery(),
         *registry.schema,
