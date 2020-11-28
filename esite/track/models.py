@@ -15,6 +15,7 @@ from esite.bifrost.models import (
     GraphQLStreamfield,
     GraphQLString,
 )
+from esite.utils.edit_handlers import ReadOnlyPanel
 from wagtail.admin.edit_handlers import (
     FieldPanel,
     FieldRowPanel,
@@ -36,8 +37,10 @@ from .validators import validate_audio_file
 from django.contrib.auth import get_user_model
 
 
-@register_paginated_query_field("project_audio_channel")
-class ProjectAudioChannel(ClusterableModel):
+@register_paginated_query_field("project_audio_channel", query_params={
+    "token": graphene.String(),
+})
+class ProjectAudioChannel(index.Indexed, ClusterableModel):
     title = models.CharField(null=True, blank=False, max_length=250)
     description = models.TextField(null=True, blank=True)
     channel_id = models.CharField(null=True, blank=False, max_length=250)
@@ -51,6 +54,13 @@ class ProjectAudioChannel(ClusterableModel):
     users = ParentalManyToManyField(
         get_user_model(), related_name="tracks", null=True, blank=True
     )
+    
+    search_fields = [
+        index.SearchField("title"),
+        index.SearchField("created_at"),
+        index.SearchField("description"),
+        index.FilterField("snekuser_id"),
+    ]
 
     graphql_fields = [
         GraphQLString("title"),
@@ -72,6 +82,7 @@ class ProjectAudioChannel(ClusterableModel):
 @register_paginated_query_field(
     "track",
     query_params={
+        "token": graphene.String(),
         "id": graphene.Int(),
         "pac": graphene.Int(),
     },
@@ -94,6 +105,7 @@ class Track(index.Indexed, TimeStampMixin):
 
     graphql_fields = [
         GraphQLString("title"),
+        GraphQLString("created_at"),
         GraphQLString("audio_file_url"),
         GraphQLString("audio_channel"),
         GraphQLString("audio_format"),
@@ -107,14 +119,17 @@ class Track(index.Indexed, TimeStampMixin):
 
     search_fields = [
         index.SearchField("title"),
+        index.SearchField("created_at"),
         index.SearchField("description"),
         index.SearchField("tags"),
         index.SearchField("transcript"),
         index.FilterField("pac"),
+        index.FilterField('snekuser_id')
     ]
 
     panels = [
         FieldPanel("title"),
+        ReadOnlyPanel("created_at"),
         FieldPanel("audio_file"),
         FieldPanel("audio_channel"),
         FieldPanel("audio_format"),
@@ -127,8 +142,8 @@ class Track(index.Indexed, TimeStampMixin):
     ]
 
     def audio_file_url(self, info, **kwargs):
-        return "%s%s" % (settings.BASE_URL, self.audio_file.url)
-
+        return "%s%s" % (settings.BASE_URL, self.audio_file.url) if self.audio_file.name else None
+    
     def __str__(self):
         return f"{self.title}"
 
