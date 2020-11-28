@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "esite.navigation",
     "esite.search",
     # Our own pages
+    "esite.colorfield",
     "esite.home",
     "esite.track",
     # Django core apps

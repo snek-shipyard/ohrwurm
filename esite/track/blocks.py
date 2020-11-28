@@ -4,13 +4,22 @@ from esite.bifrost.models import (
     GraphQLString,
 )
 
-
 @register_streamfield_block
 class TagBlock(blocks.StructBlock):
     name = blocks.CharBlock(required=True, max_length=16)
+    significance = blocks.ChoiceBlock(choices=[
+        ('sucess', 'Sucess'),
+        ('danger', 'Danger'),
+        ('warning', 'Warning'),
+        ('info', 'Info'),
+        ('light', 'Light'),
+        ('dark', 'Dark'),
+    ], required=True, icon='cup')
+    
 
     graphql_fields = [
         GraphQLString("name"),
+        GraphQLString("significance"),
     ]
 
 
