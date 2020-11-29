@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     # Our own pages
     "esite.home",
     "esite.track",
+    "esite.waveater",
     # Django core apps
     "django.contrib.admin",
     "django.contrib.auth",

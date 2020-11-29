@@ -15,7 +15,7 @@ import asyncio
 import threading
 
 from pydub import AudioSegment
-
+from django.core.files import File
 
 class WaveaterConfig(AppConfig):
     name = 'esite.waveater'
@@ -32,7 +32,7 @@ class Waveater():
     def main():
         loop = asyncio.new_event_loop()
         client = TelegramClient('anon', settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH, loop=loop).start(bot_token=settings.TELEGRAM_BOT_TOKEN)
-        
+
         @client.on(events.NewMessage(pattern='/start'))
         @client.on(events.NewMessage(pattern='/help'))
         async def start(event):
@@ -52,10 +52,10 @@ class Waveater():
             # if telegram message has attached a wav file, download and convert it
             if event.message.file and event.message.file.mime_type == 'audio/x-wav':
                 msg = await event.respond("Processing...")
-                
-                try:    
+
+                try:
                     start = time.time()
-                    
+
                     await msg.edit("**Downloading start...**")
 
                     audio_in = io.BytesIO()
@@ -74,6 +74,33 @@ class Waveater():
                     #print(event.message.file.performer)
                     #print(event.message.file.name)
                     #print(event.message.file.duration)
+                    from esite.track.models import Track, ProjectAudioChannel
+                    # pac = ProjectAudioChannel(
+                    #     title = "models.CharField(null=True, blank=False, max_length=250)",
+                    #     description = "models.TextField(null=True, blank=True)",
+                    #     channel_id = "models.CharField(null=True, blank=False, max_length=250)",
+                    #     # avatar_image = models.ForeignKey(
+                    #     #     settings.WAGTAILIMAGES_IMAGE_MODEL,
+                    #     #     null=True,
+                    #     #     blank=True,
+                    #     #     related_name="+",
+                    #     #     on_delete=models.SET_NULL,
+                    #     # )
+                    # )
+
+                    # track = TRACK(
+                    #     title = "dsssssssssssssdasdasadasdas",
+                    #     audio_channel = "ffffffffff",
+                    #     audio_format = "ffffffffff",
+                    #     audio_codec = "ffffffffff",
+                    #     audio_bitrate = "ffffffffff",
+                    #     description = "ffffffffff",
+                    #     transcript = "ffffffffff",
+                    #     pac = pac
+                    # )
+
+                    # track.audio_file.save("new_name.ogg", File(audio_out), True)
+
                     result = await client.send_file(event.chat_id, audio_out, voice_note=True, caption=f"{event.message.message}\n\n`track: '{event.message.file.name.split('.')[0]}_{event.message.media.document.date.strftime('%m-%d_%H-%M')}',\nchannel: '{audio_seg.channels}'',\nformat: 'ogg',\ncodec: 'opus',\nbitrate: '128k'`", reply_to=event.message)
                     #print(result.file.duration)
                     #print(result.file.performer)
