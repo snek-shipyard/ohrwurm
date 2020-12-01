@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import models
 from wagtail.core.fields import StreamField
 from esite.utils.models import TimeStampMixin
-from .blocks import TagBlock
+from .blocks import TagBlock, AttendeeBlock
 from modelcluster.models import ClusterableModel
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from esite.bifrost.helpers import register_paginated_query_field
@@ -98,6 +98,7 @@ class Track(index.Indexed, TimeStampMixin):
     audio_bitrate = models.CharField(null=True, blank=True, max_length=250)
     description = models.TextField(null=True, blank=True)
     tags = StreamField([("tag", TagBlock(required=True, icon="tag"))], blank=True)
+    attendees = StreamField([("attendee", AttendeeBlock(required=True, icon="user"))], blank=True)
     transcript = models.TextField(null=True, blank=True)
     pac = ParentalKey(
         "ProjectAudioChannel", related_name="tracks", on_delete=models.CASCADE
@@ -113,6 +114,7 @@ class Track(index.Indexed, TimeStampMixin):
         GraphQLString("audio_bitrate"),
         GraphQLString("description"),
         GraphQLStreamfield("tags"),
+        GraphQLStreamfield("attendees"),
         GraphQLString("transcript"),
         GraphQLForeignKey("pac", "track.ProjectAudioChannel"),
     ]
@@ -122,6 +124,7 @@ class Track(index.Indexed, TimeStampMixin):
         index.SearchField("created_at"),
         index.SearchField("description"),
         index.SearchField("tags"),
+        index.SearchField("attendees"),
         index.SearchField("transcript"),
         index.FilterField("pac"),
         index.FilterField('snekuser_id')
@@ -137,6 +140,7 @@ class Track(index.Indexed, TimeStampMixin):
         FieldPanel("audio_bitrate"),
         FieldPanel("description"),
         StreamFieldPanel("tags"),
+        StreamFieldPanel("attendees"),
         FieldPanel("transcript"),
         FieldPanel("pac"),
     ]
