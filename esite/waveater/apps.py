@@ -5,8 +5,8 @@ import logging
 
 from django.conf import settings
 from django.apps import AppConfig
+from django.core.files import File
 
-from telethon import TelegramClient, events
 from .file_handler import progress
 import os
 import time
@@ -14,8 +14,8 @@ import datetime
 import asyncio
 import threading
 
+from telethon import TelegramClient, events
 from pydub import AudioSegment
-from django.core.files import File
 
 class WaveaterConfig(AppConfig):
     name = 'esite.waveater'
@@ -111,7 +111,7 @@ class Waveater():
                     print(e)
                     await msg.edit(f"OwO Shit happens! Something has gone wrong.\n\n**Error:** {e}")
 
-        #print(f"{threading.enumerate()}")
+        print(f"{threading.enumerate()}")
         with client:
             client.run_until_disconnected()
 

@@ -70,7 +70,7 @@ INSTALLED_APPS = [
     "wagtailcaptcha",
     "graphene_django",
     "graphql_jwt.refresh_token.apps.RefreshTokenConfig",
-    "channels",
+    # "channels",
     "wagtailfontawesome",
     "pattern_library",
     "esite.project_styleguide.apps.ProjectStyleguideConfig",
