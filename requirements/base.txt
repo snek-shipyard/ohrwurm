@@ -2,7 +2,7 @@ Django==3.1.4
 wagtail==2.11.2
 psycopg2-binary==2.8.4
 wagtail-django-recaptcha==1.0
-django-pattern-library==0.2.5
+django-pattern-library==0.3.0
 graphene-django==2.12.1
 wagtailfontawesome==1.1.4
 django-graphql-jwt==0.3.1
@@ -10,8 +10,6 @@ graphene-django-optimizer==0.6.2
 django-cors-headers==3.4.0
 django-filter==2.4.0
 wagtail-generic-chooser==0.1.1
-channels==1.1.8
-asgi_redis==1.4.3
 graphql-ws==0.3.1
 wagtailmedia==0.5.0
 graphql-core==2.2.1
