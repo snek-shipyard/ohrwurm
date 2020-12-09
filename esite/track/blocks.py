@@ -6,15 +6,16 @@ from esite.bifrost.models import (
 
 @register_streamfield_block
 class TagBlock(blocks.StructBlock):
-    name = blocks.CharBlock(required=True, max_length=16)
-    significance = blocks.ChoiceBlock(choices=[
+    SIGNIFICANCE_CHOICES = [
         ('success', 'Success'),
         ('danger', 'Danger'),
         ('warning', 'Warning'),
         ('info', 'Info'),
         ('light', 'Light'),
         ('dark', 'Dark'),
-    ], required=True, icon='cup')
+    ]
+    name = blocks.CharBlock(required=True, max_length=16)
+    significance = blocks.ChoiceBlock(choices=SIGNIFICANCE_CHOICES, required=True, icon='cup')
     
 
     graphql_fields = [
