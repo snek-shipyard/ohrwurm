@@ -8,7 +8,7 @@ from esite.bifrost.models import (
 class TagBlock(blocks.StructBlock):
     name = blocks.CharBlock(required=True, max_length=16)
     significance = blocks.ChoiceBlock(choices=[
-        ('sucess', 'Sucess'),
+        ('success', 'Success'),
         ('danger', 'Danger'),
         ('warning', 'Warning'),
         ('info', 'Info'),
