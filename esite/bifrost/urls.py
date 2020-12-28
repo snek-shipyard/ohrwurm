@@ -3,9 +3,9 @@ from django.conf.urls import url
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from channels.routing import route_class
+# from channels.routing import route_class
 from graphene_file_upload.django import FileUploadGraphQLView
-from graphql_ws.django_channels import GraphQLSubscriptionConsumer
+# from graphql_ws.django_channels import GraphQLSubscriptionConsumer
 
 
 def graphiql(request):
@@ -30,4 +30,4 @@ if SHOULD_EXPOSE_GRAPHIQL:
     urlpatterns.append(url(r"^graphiql", graphiql))
 
 # Django Channel (v1.x) routing for subscription support
-channel_routing = [route_class(GraphQLSubscriptionConsumer, path=r"^/subscriptions")]
+# channel_routing = [route_class(GraphQLSubscriptionConsumer, path=r"^/subscriptions")]
