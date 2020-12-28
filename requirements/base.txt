@@ -16,4 +16,5 @@ graphql-core==2.2.1
 factory-boy==2.12.0
 wagtail-factories==2.0.0
 wagtail-headless-preview==0.1.4
+telethon==1.18.2
 pydub==0.24.1
