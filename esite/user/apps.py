@@ -41,24 +41,24 @@ def define_ohrwurm_groups(sender, **kwargs):
         Permission.objects.get_or_create(codename="can_update_members", name="Can update ohrwurm members", content_type=user_ct)[0],
         Permission.objects.get_or_create(codename="can_view_members", name="Can view ohrwurm members", content_type=user_ct)[0],
         # Project permissions
-        Permission.objects.get_or_create(codename="can_add", name="Can add projects", content_type=project_ct)[0],
-        Permission.objects.get_or_create(codename="can_delete", name="Can delete projects", content_type=project_ct)[0],
-        Permission.objects.get_or_create(codename="can_update", name="Can update projects", content_type=project_ct)[0],
-        Permission.objects.get_or_create(codename="can_view", name="Can view projects", content_type=project_ct)[0],
-        Permission.objects.get_or_create(codename="can_assign_members", name="Can assign members to projects", content_type=project_ct)[0],
+        Permission.objects.get_or_create(codename="can_add_projects", name="Can add projects", content_type=project_ct)[0],
+        Permission.objects.get_or_create(codename="can_delete_projects", name="Can delete projects", content_type=project_ct)[0],
+        Permission.objects.get_or_create(codename="can_update_projects", name="Can update projects", content_type=project_ct)[0],
+        Permission.objects.get_or_create(codename="can_view_projects", name="Can view projects", content_type=project_ct)[0],
+        Permission.objects.get_or_create(codename="can_assign_project_members", name="Can assign members to projects", content_type=project_ct)[0],
         # Track permissions
-        Permission.objects.get_or_create(codename="can_add", name="Can add tracks", content_type=track_ct)[0],
-        Permission.objects.get_or_create(codename="can_delete", name="Can delete tracks", content_type=track_ct)[0],
-        Permission.objects.get_or_create(codename="can_update", name="Can update tracks", content_type=track_ct)[0],
-        Permission.objects.get_or_create(codename="can_view", name="Can view tracks", content_type=track_ct)[0],
+        Permission.objects.get_or_create(codename="can_add_tracks", name="Can add tracks", content_type=track_ct)[0],
+        Permission.objects.get_or_create(codename="can_delete_tracks", name="Can delete tracks", content_type=track_ct)[0],
+        Permission.objects.get_or_create(codename="can_update_tracks", name="Can update tracks", content_type=track_ct)[0],
+        Permission.objects.get_or_create(codename="can_view_tracks", name="Can view tracks", content_type=track_ct)[0],
     ]
     member_permissions = [
         # Project permissions
-        Permission.objects.get_or_create(codename="can_view", name="Can view projects", content_type=project_ct)[0],
+        Permission.objects.get_or_create(codename="can_view_projects", name="Can view projects", content_type=project_ct)[0],
         # Track permissions
-        Permission.objects.get_or_create(codename="can_add", name="Can add tracks", content_type=track_ct)[0],
-        Permission.objects.get_or_create(codename="can_delete", name="Can delete tracks", content_type=track_ct)[0],
-        Permission.objects.get_or_create(codename="can_view", name="Can view tracks", content_type=track_ct)[0],
+        Permission.objects.get_or_create(codename="can_add_tracks", name="Can add tracks", content_type=track_ct)[0],
+        Permission.objects.get_or_create(codename="can_delete_tracks", name="Can delete tracks", content_type=track_ct)[0],
+        Permission.objects.get_or_create(codename="can_view_tracks", name="Can view tracks", content_type=track_ct)[0],
     ]
     
     create_group('ohrwurm-supervisor', supervisor_permissions)

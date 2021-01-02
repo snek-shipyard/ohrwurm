@@ -26,7 +26,7 @@ class AddPACMember(graphene.Mutation):
         username = graphene.String(required=True)
         
     @login_required
-    @permission_required("track.can_assign_members")
+    @permission_required("track.can_assign_project_members")
     def mutate(
         self,
         info,
@@ -56,7 +56,7 @@ class DeletePACMember(graphene.Mutation):
         username = graphene.String(required=True)
         
     @login_required
-    @permission_required("track.can_assign_members")
+    @permission_required("track.can_assign_project_members")
     def mutate(
         self,
         info,
