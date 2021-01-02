@@ -72,7 +72,9 @@ class DeleteOhrwurmMember(graphene.Mutation):
         **kwargs
     ):
         try:
-            SNEKUser.objects.get(username=username).delete()
+            user = SNEKUser.objects.get(username=username)
+            user.is_active = False
+            user.save()
         except SNEKUser.DoesNotExist:
             raise GraphQLError("User does not exist")
         
@@ -129,7 +131,7 @@ class Query(graphene.ObjectType):
     @login_required
     @permission_required('user.can_view_members')
     def resolve_ohrwurm_members(self, info, **kwargs):
-        members = SNEKUser.objects.filter(groups__name='ohrwurm-member')
+        members = SNEKUser.objects.filter(groups__name='ohrwurm-member', is_active=True)
         return members
 
 
