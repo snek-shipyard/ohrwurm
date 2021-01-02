@@ -1,4 +1,4 @@
-from esite.user.schema import AddOhrwurmMember, DeleteOhrwurmMember, UpdateOhrwurmMember
+from esite.user.schema import AddOhrwurmMember, ChangePassword, DeleteOhrwurmMember, UpdateOhrwurmMember
 from django.conf import settings
 
 # django
@@ -60,6 +60,7 @@ def create_schema():
             "add_ohrwurm_member": AddOhrwurmMember.Field(),
             "delete_ohrwurm_member": DeleteOhrwurmMember.Field(),
             "update_ohrwurm_member": UpdateOhrwurmMember.Field(),
+            "change_password": ChangePassword.Field(),
         }
 
         dict_params.update(

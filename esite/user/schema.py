@@ -1,6 +1,6 @@
 from django.contrib.auth.models import Group
 from esite.user.models import SNEKUser
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, update_session_auth_hash
 
 import graphene
 from graphene_django import DjangoObjectType
@@ -110,10 +110,43 @@ class UpdateOhrwurmMember(graphene.Mutation):
         
         return UpdateOhrwurmMember(member=member)
 
+class ChangePassword(graphene.Mutation):
+    success = graphene.Boolean()
+    
+    class Arguments:
+        token = graphene.String(required=False)
+        new_password = graphene.String(required=True)
+        
+    @login_required
+    def mutate(
+        self,
+        info,
+        new_password,
+        **kwargs
+    ):
+        try:
+            username = info.context.user.username
+            user = SNEKUser.objects.get(username=username)
+
+            if user.check_password(new_password):
+                raise GraphQLError("The new password must not match the old one")
+            
+            user.set_password(new_password)
+            user.password_changed = True
+            # Session invalidation on password change
+            # Ref: https://docs.djangoproject.com/en/3.1/topics/auth/default/#session-invalidation-on-password-change
+            update_session_auth_hash(info.context, user)
+            user.save()
+        except SNEKUser.DoesNotExist:
+            raise GraphQLError("User does not exist")
+        
+        return DeleteOhrwurmMember(success=True)
+    
 class Mutation(graphene.ObjectType):
     add_ohrwurm_member = AddOhrwurmMember.Field()
     delete_ohrwurm_member = DeleteOhrwurmMember.Field()
     update_ohrwurm_member = UpdateOhrwurmMember.Field()
+    change_password = ChangePassword.Field()
 
 
 class Query(graphene.ObjectType):
