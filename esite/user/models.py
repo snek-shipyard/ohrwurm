@@ -50,7 +50,7 @@ class SNEKUser(AbstractUser, ClusterableModel):
         validators=[django.contrib.auth.validators.UnicodeUsernameValidator()],
     )
     telegram_user_id = models.CharField(
-        null=True, blank=True, unique=True, max_length=250
+        null=True, blank=True, max_length=250
     )
 
     # Custom save function
