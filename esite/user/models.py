@@ -49,15 +49,13 @@ class SNEKUser(AbstractUser, ClusterableModel):
         unique=True,
         validators=[django.contrib.auth.validators.UnicodeUsernameValidator()],
     )
+    password_changed = models.BooleanField(default=False)
     telegram_user_id = models.CharField(
         null=True, blank=True, max_length=250
     )
 
     # Custom save function
     def save(self, *args, **kwargs):
-        if self.pk is None:
-            self.is_active = False
-
         super(SNEKUser, self).save(*args, **kwargs)
 
     panels = [
