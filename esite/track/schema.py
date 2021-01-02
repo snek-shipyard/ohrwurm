@@ -23,7 +23,7 @@ class AddPACMember(graphene.Mutation):
     class Arguments:
         token = graphene.String(required=False)
         pac_id = graphene.ID(required=True)
-        username = graphene.ID(required=True)
+        username = graphene.String(required=True)
         
     @login_required
     @permission_required("track.can_assign_members")
@@ -53,7 +53,7 @@ class DeletePACMember(graphene.Mutation):
     class Arguments:
         token = graphene.String(required=False)
         pac_id = graphene.ID(required=True)
-        username = graphene.ID(required=True)
+        username = graphene.String(required=True)
         
     @login_required
     @permission_required("track.can_assign_members")
