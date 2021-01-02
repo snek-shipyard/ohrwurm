@@ -1,3 +1,4 @@
+import hashlib
 from django.apps import AppConfig
 
 from django.db.models.signals import post_migrate
@@ -71,7 +72,7 @@ def define_users(sender, **kwargs):
     if not User.objects.exists():
         create_user(username="admin", password="ciscocisco", is_superuser=True)
         create_user(username="cisco", password="ciscocisco")
-        create_user(username="falco", password="changeme", groups=["ohrwurm-supervisor", "ohrwurm-member"])
+        create_user(username="falco", password=hashlib.sha256(b"changeme").hexdigest(), groups=["ohrwurm-supervisor", "ohrwurm-member"])
 
 class UsersConfig(AppConfig):
     name = "esite.user"
