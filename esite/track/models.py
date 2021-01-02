@@ -43,7 +43,7 @@ from django.contrib.auth import get_user_model
 class ProjectAudioChannel(index.Indexed, ClusterableModel):
     title = models.CharField(null=True, blank=False, max_length=250)
     description = models.TextField(null=True, blank=True)
-    channel_id = models.CharField(null=True, blank=False, max_length=250)
+    channel_id = models.CharField(null=True, blank=True, max_length=250)
     avatar_image = models.ForeignKey(
         settings.WAGTAILIMAGES_IMAGE_MODEL,
         null=True,
