@@ -51,7 +51,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
         related_name="+",
         on_delete=models.SET_NULL,
     )
-    users = ParentalManyToManyField(
+    members = ParentalManyToManyField(
         get_user_model(), related_name="tracks", null=True, blank=True
     )
     
@@ -67,7 +67,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
         GraphQLString("description"),
         GraphQLString("channel_id"),
         GraphQLImage("avatar_image"),
-        GraphQLCollection(GraphQLForeignKey, "users", get_user_model()),
+        GraphQLCollection(GraphQLForeignKey, "members", get_user_model()),
     ]
 
     def __str__(self):
@@ -76,7 +76,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
     @classmethod
     @login_required
     def bifrost_queryset(cls, info, **kwargs):
-        return cls.objects.filter(users=info.context.user)
+        return cls.objects.filter(members=info.context.user)
 
 
 @register_paginated_query_field(
@@ -154,7 +154,7 @@ class Track(index.Indexed, TimeStampMixin):
     @classmethod
     @login_required
     def bifrost_queryset(cls, info, **kwargs):
-        return cls.objects.filter(pac__users=info.context.user)
+        return cls.objects.filter(pac__members=info.context.user)
 
 
 # SPDX-License-Identifier: (EUPL-1.2)
