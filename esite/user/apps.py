@@ -30,7 +30,6 @@ def define_ohrwurm_groups(sender, **kwargs):
     
     User = get_user_model()
     
-    # track_permissions =  Permission.objects.filter(content_type=ContentType.objects.get_for_model(OhrwurmGroup))
     user_ct = ContentType.objects.get_for_model(User)
     project_ct = ContentType.objects.get_for_model(ProjectAudioChannel)
     track_ct = ContentType.objects.get_for_model(Track)
@@ -72,7 +71,7 @@ def define_users(sender, **kwargs):
     if not User.objects.exists():
         create_user(username="admin", password="ciscocisco", is_superuser=True)
         create_user(username="cisco", password="ciscocisco")
-        create_user(username="falco", password="changeme", groups=["ohrwurm-supervisor"])
+        create_user(username="falco", password="changeme", groups=["ohrwurm-supervisor", "ohrwurm-member"])
 
 class UsersConfig(AppConfig):
     name = "esite.user"
