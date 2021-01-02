@@ -55,7 +55,7 @@ class SNEKUser(AbstractUser, ClusterableModel):
 
     # Custom save function
     def save(self, *args, **kwargs):
-        if self.pk is not None:
+        if self.pk is None:
             self.is_active = False
 
         super(SNEKUser, self).save(*args, **kwargs)
