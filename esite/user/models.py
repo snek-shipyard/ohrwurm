@@ -63,6 +63,7 @@ class SNEKUser(AbstractUser, ClusterableModel):
         MultiFieldPanel(
             [
                 FieldPanel("is_active"),
+                FieldPanel("password_changed"),
             ],
             "Settings",
         ),
@@ -77,6 +78,7 @@ class SNEKUser(AbstractUser, ClusterableModel):
     graphql_fields = [
         GraphQLString("username"),
         GraphQLBoolean("is_active"),
+        GraphQLBoolean("password_changed"),
     ]
 
     def __str__(self):
