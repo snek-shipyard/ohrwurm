@@ -1,4 +1,4 @@
-from esite.track.schema import AddPACMember, DeletePACMember, AddPAC, DeletePAC, UpdatePAC
+from esite.track.schema import AddPACMember, AddTrack, DeletePACMember, AddPAC, DeletePAC, DeleteTrack, UpdatePAC, UpdateTrack
 from esite.user.schema import AddOhrwurmMember, ChangePassword, DeleteOhrwurmMember, UpdateOhrwurmMember
 from django.conf import settings
 
@@ -67,6 +67,9 @@ def create_schema():
             "add_pac": AddPAC.Field(),
             "delete_pac": DeletePAC.Field(),
             "update_pac": UpdatePAC.Field(),
+            "add_track": AddTrack.Field(),
+            "delete_track": DeleteTrack.Field(),
+            "update_track": UpdateTrack.Field(),
         }
 
         dict_params.update(

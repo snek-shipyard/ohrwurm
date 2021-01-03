@@ -1,10 +1,12 @@
-from esite.track.models import ProjectAudioChannel
+from esite.track.models import ProjectAudioChannel, Track
 from django.contrib.auth.models import Group
 from esite.user.models import SNEKUser
 from django.contrib.auth import get_user_model, update_session_auth_hash
 
 import graphene
+import json
 from graphene_django import DjangoObjectType
+from graphene_file_upload.scalars import Upload
 from graphql import GraphQLError
 from graphql_jwt.decorators import (
     login_required,
@@ -16,6 +18,22 @@ from graphql_jwt.decorators import (
 class PACType(DjangoObjectType):
     class Meta:
         model = ProjectAudioChannel
+        
+class TrackType(DjangoObjectType):
+    class Meta:
+        model = Track
+
+class Significance(graphene.Enum):
+    SUCCESS = 'success'
+    DANGER = 'danger'
+    WARNING = 'warning'
+    INFO = 'info'
+    LIGHT = 'light'
+    DARK = 'dark'
+
+class TagType(graphene.InputObjectType):
+    name = graphene.String()
+    significance = Significance()
 
 class AddPACMember(graphene.Mutation):
     pac = graphene.Field(PACType)
@@ -40,7 +58,7 @@ class AddPACMember(graphene.Mutation):
         except SNEKUser.DoesNotExist:
             raise GraphQLError("User does not exist")
         except ProjectAudioChannel.DoesNotExist:
-          raise GraphQLError("PAC does not exist")
+            raise GraphQLError("PAC does not exist")
         
         pac.members.add(user)
         pac.save()
@@ -70,7 +88,7 @@ class DeletePACMember(graphene.Mutation):
         except SNEKUser.DoesNotExist:
             raise GraphQLError("User does not exist")
         except ProjectAudioChannel.DoesNotExist:
-          raise GraphQLError("PAC does not exist")
+            raise GraphQLError("PAC does not exist")
         
         pac.members.remove(user)
         pac.save()
@@ -98,16 +116,16 @@ class AddPAC(graphene.Mutation):
         members=[],
         **kwargs
     ):
-      User = get_user_model()
-      pac = ProjectAudioChannel.objects.create(title=title, description=description, channel_id=channel_id)
+        User = get_user_model()
+        pac = ProjectAudioChannel.objects.create(title=title, description=description, channel_id=channel_id)
 
-      for member in members:
-        try:
-          pac.members.add(User.objects.get(username=member))
-        except User.DoesNotExist:
-          pass
+        for member in members:
+            try:
+                pac.members.add(User.objects.get(username=member))
+            except User.DoesNotExist:
+                pass
 
-      return AddPAC(pac=pac)
+        return AddPAC(pac=pac)
 
 class DeletePAC(graphene.Mutation):
     success = graphene.String()
@@ -151,38 +169,135 @@ class UpdatePAC(graphene.Mutation):
         members=[],
         **kwargs
     ):
-      print(kwargs)
-      User = get_user_model()
-      try:
-        pac = ProjectAudioChannel.objects.get(pk=id)
-      except ProjectAudioChannel.DoesNotExist:
-        raise GraphQLError("PAC does not exist")
-
-      new_members = []
-      for member in members:
+        print(kwargs)
+        User = get_user_model()
         try:
-          new_members.append(User.objects.get(username=member))
-        except User.DoesNotExist:
-          pass
-        
-      pac.members.set(new_members)
-      pac.save()
-      
-      ProjectAudioChannel.objects.filter(pk=id).update(**kwargs)
-      # Refreshing objects from databse
-      # Ref: https://docs.djangoproject.com/en/3.1/ref/models/instances/#refreshing-objects-from-database
-      pac.refresh_from_db()
+            pac = ProjectAudioChannel.objects.get(pk=id)
+        except ProjectAudioChannel.DoesNotExist:
+            raise GraphQLError("PAC does not exist")
 
-      return UpdatePAC(pac=pac)
+        new_members = []
+        for member in members:
+            try:
+                new_members.append(User.objects.get(username=member))
+            except User.DoesNotExist:
+                pass
+            
+        pac.members.set(new_members)
+        pac.save()
+        
+        if kwargs.get("token"):
+                kwargs.pop("token")
+        ProjectAudioChannel.objects.filter(pk=id).update(**kwargs)
+        # Refreshing objects from databse
+        # Ref: https://docs.djangoproject.com/en/3.1/ref/models/instances/#refreshing-objects-from-database
+        pac.refresh_from_db()
+
+        return UpdatePAC(pac=pac)
 
 class AddTrack(graphene.Mutation):
-  pass
+    track = graphene.Field(TrackType)
+        
+    class Arguments:
+            token = graphene.String(required=False)
+            title = graphene.String(required=True)
+            description = graphene.String(required=False)
+            pac_id = graphene.ID(required=True)
+            created_At = graphene.DateTime(required=False)
+            tags = graphene.List(TagType, required=False)
+            attendees = graphene.List(graphene.String, required=False)
+            audio_file = Upload(required=False)
+
+            
+    @login_required
+    @permission_required("track.can_add_tracks")
+    def mutate(
+        self,
+        info,
+        title,
+        pac_id,
+        audio_file=None,
+        description=None,
+        created_At=None,
+        tags=[],
+        attendees=[],
+        **kwargs
+    ):
+        track = Track(title=title, description=description, pac_id=pac_id, audio_file=audio_file)
+        track.attendees = json.dumps([{"type": "attendee", "value": {"name": attendee}} for attendee in attendees])
+        track.tags = json.dumps([{"type": "tag", "value": tag} for tag in tags])
+        
+        track.save()
+
+        if created_At:
+            track.created_at = created_At
+            
+        track.save()
+        
+        return AddTrack(track=track)
 
 class DeleteTrack(graphene.Mutation):
-  pass
+    success = graphene.String()
+
+    class Arguments:
+        token = graphene.String(required=False)
+        id = graphene.ID(required=True)
+
+    @login_required
+    @permission_required("user.can_delete_tracks")
+    def mutate(
+            self,
+            info,
+            id,
+            **kwargs
+    ):
+        try:
+                Track.objects.get(pk=id).delete()
+        except Track.DoesNotExist:
+                raise GraphQLError("Track does not exist")
+        
+        return DeleteTrack(success=True)
 
 class UpdateTrack(graphene.Mutation):
-  pass
+    track = graphene.Field(TrackType)
+    
+    class Arguments:
+        token = graphene.String(required=False)
+        id = graphene.ID(required=True)
+        title = graphene.String(required=False)
+        description = graphene.String(required=False)
+        tags = graphene.List(TagType, required=False)
+        attendees = graphene.List(graphene.String, required=False)
+        
+    @login_required
+    @permission_required("track.can_update_tracks")
+    def mutate(
+        self,
+        info,
+        id,
+        tags=[],
+        attendees=[],
+        **kwargs
+    ):
+                try:
+                    track = Track.objects.get(pk=id)
+                    
+                    track.attendees = json.dumps([{"type": "attendee", "value": {"name": attendee}} for attendee in attendees])
+                    track.tags = json.dumps([{"type": "tag", "value": tag} for tag in tags])
+                
+                    track.save()
+
+                    if kwargs.get("token"):
+                        kwargs.pop("token")
+
+                    Track.objects.filter(pk=id).update(**kwargs)
+                    # Refreshing objects from databse
+                    # Ref: https://docs.djangoproject.com/en/3.1/ref/models/instances/#refreshing-objects-from-database
+                    track.refresh_from_db()
+                except Track.DoesNotExist:
+                    raise GraphQLError("Track does not exist")    
+
+                return UpdateTrack(track=track)
 
 class Mutation(graphene.ObjectType):
     add_pac_member = AddPACMember.Field()
@@ -190,6 +305,9 @@ class Mutation(graphene.ObjectType):
     add_pac = AddPAC.Field()
     delete_pac = DeletePAC.Field()
     update_pac = UpdatePAC.Field()
+    add_track = AddTrack.Field()
+    delete_track = DeleteTrack.Field()
+    update_track = UpdateTrack.Field()
 
 # SPDX-License-Identifier: (EUPL-1.2)
 # Copyright © 2019-2020 Simon Prast
