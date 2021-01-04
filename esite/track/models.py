@@ -84,7 +84,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
     query_params={
         "token": graphene.String(),
         "id": graphene.Int(),
-        "pac": graphene.Int(),
+        "pac": graphene.ID(),
     },
 )
 class Track(index.Indexed, TimeStampMixin):
