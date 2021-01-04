@@ -19,6 +19,10 @@ class OhrwurmMemberType(DjangoObjectType):
         model = SNEKUser
         exclude_fields = ["password"]
 
+    is_ohrwurm_supervisor = graphene.Boolean()
+    def resolve_is_ohrwurm_supervisor(instance, info, **kwargs): 
+        return instance.is_ohrwurm_supervisor(info)
+
 class AddOhrwurmMember(graphene.Mutation):
     member = graphene.Field(OhrwurmMemberType)
     generated_password = graphene.String()
