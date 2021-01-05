@@ -52,7 +52,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
         on_delete=models.SET_NULL,
     )
     members = ParentalManyToManyField(
-        get_user_model(), related_name="tracks", null=True, blank=True
+        get_user_model(), related_name="pacs", null=True, blank=True
     )
     
     search_fields = [
