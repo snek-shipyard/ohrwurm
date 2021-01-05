@@ -3,7 +3,9 @@ from django.contrib.auth.models import Group
 from esite.user.models import SNEKUser
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.conf import settings
-
+from django.core.files import File
+import io
+from pydub import AudioSegment
 import graphene
 import json
 from graphene_django import DjangoObjectType
@@ -235,6 +237,26 @@ class AddTrack(graphene.Mutation):
         attendees=[],
         **kwargs
     ):
+
+        if audio_file.content_type == "audio/x-wav":
+            audio_seg = AudioSegment.from_wav(audio_file.file)
+            audio_out = io.BytesIO()
+            audio_out = audio_seg.export(audio_out,
+                                               bitrate="128k",
+                                               format='ogg',
+                                               codec="opus",
+                                               parameters=["-strict", "-2", "-ac", "2", "-vol", "150"],
+                                               tags={"ARTIST": "waveater", "GENRE": "Meeting/Trashtalk",
+                                                     "ALBUM": "waveater",
+                                                     "TITLE": f"{audio_file._name.split('.')[0]}_{created_At.strftime('%m-%d_%H-%M')}",
+                                                     "DATE": f"{created_At.strftime('%Y/%m/%d_%H:%M:%S')}",
+                                                     "COMMENT": f"A wav file converted to telegram voice message.",
+                                                     "CONTACT":"@waveater"
+                                                })
+            audio_out.name = f"{audio_file._name.split('.')[0]}_{created_At.strftime('%m-%d_%H-%M')}.ogg"
+            
+            audio_file = File(audio_out)
+
         track = Track(title=title, description=description, pac_id=pac_id, audio_file=audio_file)
         track.attendees = json.dumps([{"type": "attendee", "value": attendee} for attendee in attendees])
         track.tags = json.dumps([{"type": "tag", "value": tag} for tag in tags])
@@ -244,7 +266,7 @@ class AddTrack(graphene.Mutation):
         if created_At:
             track.created_at = created_At
             
-        track.save()
+            track.save()
         
         return AddTrack(track=track)
 
