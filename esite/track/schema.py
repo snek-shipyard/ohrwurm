@@ -2,6 +2,7 @@ from esite.track.models import ProjectAudioChannel, Track
 from django.contrib.auth.models import Group
 from esite.user.models import SNEKUser
 from django.contrib.auth import get_user_model, update_session_auth_hash
+from django.conf import settings
 
 import graphene
 import json
@@ -22,6 +23,11 @@ class PACType(DjangoObjectType):
 class TrackType(DjangoObjectType):
     class Meta:
         model = Track
+        exclude = ["audio_file"]
+    
+    audio_file_url = graphene.String()
+    def resolve_audio_file_url(instance, info, **kwargs):
+        return "%s%s" % (settings.BASE_URL, instance.audio_file.url) if instance.audio_file.name else None
 
 class Significance(graphene.Enum):
     SUCCESS = 'success'
@@ -34,6 +40,9 @@ class Significance(graphene.Enum):
 class TagType(graphene.InputObjectType):
     name = graphene.String()
     significance = Significance()
+    
+class AttendeeType(graphene.InputObjectType):
+    name = graphene.String()
 
 class AddPACMember(graphene.Mutation):
     pac = graphene.Field(PACType)
@@ -124,6 +133,8 @@ class AddPAC(graphene.Mutation):
                 pac.members.add(User.objects.get(username=member))
             except User.DoesNotExist:
                 pass
+            
+        pac.save()
 
         return AddPAC(pac=pac)
 
@@ -135,7 +146,7 @@ class DeletePAC(graphene.Mutation):
         id = graphene.ID(required=True)
 
     @login_required
-    @permission_required("user.can_delete_projects")
+    @permission_required("track.can_delete_projects")
     def mutate(
         self,
         info,
@@ -166,7 +177,7 @@ class UpdatePAC(graphene.Mutation):
         self,
         info,
         id,
-        members=[],
+        members=None,
         **kwargs
     ):
         print(kwargs)
@@ -175,15 +186,16 @@ class UpdatePAC(graphene.Mutation):
             pac = ProjectAudioChannel.objects.get(pk=id)
         except ProjectAudioChannel.DoesNotExist:
             raise GraphQLError("PAC does not exist")
-
-        new_members = []
-        for member in members:
-            try:
-                new_members.append(User.objects.get(username=member))
-            except User.DoesNotExist:
-                pass
-            
-        pac.members.set(new_members)
+        
+        if members:
+            new_members = []
+            for member in members:
+                try:
+                    new_members.append(User.objects.get(username=member))
+                except User.DoesNotExist:
+                    pass
+                
+            pac.members.set(new_members)
         pac.save()
         
         if kwargs.get("token"):
@@ -205,7 +217,7 @@ class AddTrack(graphene.Mutation):
             pac_id = graphene.ID(required=True)
             created_At = graphene.DateTime(required=False)
             tags = graphene.List(TagType, required=False)
-            attendees = graphene.List(graphene.String, required=False)
+            attendees = graphene.List(AttendeeType, required=False)
             audio_file = Upload(required=False)
 
             
@@ -224,7 +236,7 @@ class AddTrack(graphene.Mutation):
         **kwargs
     ):
         track = Track(title=title, description=description, pac_id=pac_id, audio_file=audio_file)
-        track.attendees = json.dumps([{"type": "attendee", "value": {"name": attendee}} for attendee in attendees])
+        track.attendees = json.dumps([{"type": "attendee", "value": attendee} for attendee in attendees])
         track.tags = json.dumps([{"type": "tag", "value": tag} for tag in tags])
         
         track.save()
@@ -244,7 +256,7 @@ class DeleteTrack(graphene.Mutation):
         id = graphene.ID(required=True)
 
     @login_required
-    @permission_required("user.can_delete_tracks")
+    @permission_required("track.can_delete_tracks")
     def mutate(
             self,
             info,
@@ -267,7 +279,7 @@ class UpdateTrack(graphene.Mutation):
         title = graphene.String(required=False)
         description = graphene.String(required=False)
         tags = graphene.List(TagType, required=False)
-        attendees = graphene.List(graphene.String, required=False)
+        attendees = graphene.List(AttendeeType, required=False)
         
     @login_required
     @permission_required("track.can_update_tracks")
@@ -275,15 +287,17 @@ class UpdateTrack(graphene.Mutation):
         self,
         info,
         id,
-        tags=[],
-        attendees=[],
+        tags=None,
+        attendees=None,
         **kwargs
     ):
                 try:
                     track = Track.objects.get(pk=id)
                     
-                    track.attendees = json.dumps([{"type": "attendee", "value": {"name": attendee}} for attendee in attendees])
-                    track.tags = json.dumps([{"type": "tag", "value": tag} for tag in tags])
+                    if attendees:
+                        track.attendees = json.dumps([{"type": "attendee", "value": attendee} for attendee in attendees])
+                    if tags:
+                        track.tags = json.dumps([{"type": "tag", "value": tag} for tag in tags])
                 
                     track.save()
 
