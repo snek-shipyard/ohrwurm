@@ -1,8 +1,10 @@
+from esite.track.models import ProjectAudioChannel
 from django.contrib.auth.models import Group
 from esite.user.models import SNEKUser
 from django.contrib.auth import get_user_model, update_session_auth_hash
 
 import graphene
+import hashlib
 from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 from graphql_jwt.decorators import (
@@ -30,6 +32,7 @@ class AddOhrwurmMember(graphene.Mutation):
     class Arguments:
         token = graphene.String(required=False)
         username = graphene.String(required=True)
+        pacs = graphene.List(graphene.ID, required=False)
         is_supervisor = graphene.Boolean(required=False)
 
     @login_required
@@ -38,6 +41,7 @@ class AddOhrwurmMember(graphene.Mutation):
         self,
         info,
         username,
+        pacs=[],
         is_supervisor=False,
         **kwargs
     ):
@@ -46,13 +50,15 @@ class AddOhrwurmMember(graphene.Mutation):
         try:
             member = SNEKUser.objects.get(username=username)
         except SNEKUser.DoesNotExist:
-            member = SNEKUser.objects.create(username=username)
-            member.set_password(password)
+            member = SNEKUser.objects.create(username=username, is_active=True)
+            member.set_password(hashlib.sha256(str.encode(password)).hexdigest())
             
             if is_supervisor:
                 member.groups.add(Group.objects.get(name="ohrwurm-supervisor"))
-            else:
-                member.groups.add(Group.objects.get(name="ohrwurm-member"))
+            
+            member.groups.add(Group.objects.get(name="ohrwurm-member"))
+
+            member.pacs.add(*pacs)
 
             member.save()
         else:
@@ -90,7 +96,8 @@ class UpdateOhrwurmMember(graphene.Mutation):
     class Arguments:
         token = graphene.String(required=False)
         username = graphene.String(required=True)
-        is_supervisor = graphene.Boolean(required=True)
+        pacs = graphene.List(graphene.ID, required=False)
+        is_supervisor = graphene.Boolean(required=False)
 
     @login_required
     @permission_required("user.can_update_members")
@@ -98,6 +105,7 @@ class UpdateOhrwurmMember(graphene.Mutation):
         self,
         info,
         username,
+        pacs=None,
         is_supervisor=False,
         **kwargs
     ):
@@ -109,6 +117,10 @@ class UpdateOhrwurmMember(graphene.Mutation):
                 member.groups.add(supervisor_group)
             else:
                 member.groups.remove(supervisor_group)
+                
+            if pacs:
+                member.pacs.set(*pacs)
+
         except SNEKUser.DoesNotExist:
             raise GraphQLError("User does not exist")
         
