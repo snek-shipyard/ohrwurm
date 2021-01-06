@@ -84,6 +84,7 @@ class SNEKUser(AbstractUser, ClusterableModel):
         GraphQLBoolean("is_active"),
         GraphQLBoolean("is_ohrwurm_supervisor"),
         GraphQLBoolean("password_changed"),
+        GraphQLCollection(GraphQLForeignKey, "pacs", "track.ProjectAudioChannel"),
     ]
 
     def __str__(self):
