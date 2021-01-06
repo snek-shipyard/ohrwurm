@@ -33,7 +33,7 @@ class AddOhrwurmMember(graphene.Mutation):
         token = graphene.String(required=False)
         username = graphene.String(required=True)
         pacs = graphene.List(graphene.ID, required=False)
-        is_supervisor = graphene.Boolean(required=False)
+        is_ohrwurm_supervisor = graphene.Boolean(required=False)
 
     @login_required
     @permission_required("user.can_add_members")
@@ -42,7 +42,7 @@ class AddOhrwurmMember(graphene.Mutation):
         info,
         username,
         pacs=[],
-        is_supervisor=False,
+        is_ohrwurm_supervisor=False,
         **kwargs
     ):
         password = SNEKUser.objects.make_random_password()
@@ -53,7 +53,7 @@ class AddOhrwurmMember(graphene.Mutation):
             member = SNEKUser.objects.create(username=username, is_active=True)
             member.set_password(hashlib.sha256(str.encode(password)).hexdigest())
             
-            if is_supervisor:
+            if is_ohrwurm_supervisor:
                 member.groups.add(Group.objects.get(name="ohrwurm-supervisor"))
             
             member.groups.add(Group.objects.get(name="ohrwurm-member"))
@@ -97,7 +97,7 @@ class UpdateOhrwurmMember(graphene.Mutation):
         token = graphene.String(required=False)
         username = graphene.String(required=True)
         pacs = graphene.List(graphene.ID, required=False)
-        is_supervisor = graphene.Boolean(required=False)
+        is_ohrwurm_supervisor = graphene.Boolean(required=False)
 
     @login_required
     @permission_required("user.can_update_members")
@@ -106,14 +106,14 @@ class UpdateOhrwurmMember(graphene.Mutation):
         info,
         username,
         pacs=None,
-        is_supervisor=False,
+        is_ohrwurm_supervisor=False,
         **kwargs
     ):
         try:
             member = SNEKUser.objects.get(username=username)
             supervisor_group = Group.objects.get(name="ohrwurm-supervisor")
             
-            if is_supervisor:
+            if is_ohrwurm_supervisor:
                 member.groups.add(supervisor_group)
             else:
                 member.groups.remove(supervisor_group)
