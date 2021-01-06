@@ -119,7 +119,7 @@ class UpdateOhrwurmMember(graphene.Mutation):
                 member.groups.remove(supervisor_group)
                 
             if pacs:
-                member.pacs.set(*pacs)
+                member.pacs.set(pacs)
 
         except SNEKUser.DoesNotExist:
             raise GraphQLError("User does not exist")
