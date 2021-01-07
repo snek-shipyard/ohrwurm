@@ -1,13 +1,9 @@
-import json
-import uuid
-
 import django.contrib.auth.validators
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.core.mail import send_mail
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-
 from modelcluster.models import ClusterableModel
 from wagtail.admin.edit_handlers import (
     FieldPanel,
@@ -50,13 +46,10 @@ class SNEKUser(AbstractUser, ClusterableModel):
         validators=[django.contrib.auth.validators.UnicodeUsernameValidator()],
     )
     password_changed = models.BooleanField(default=False)
-    telegram_user_id = models.CharField(
-        null=True, blank=True, max_length=250
-    )
-    
+    telegram_user_id = models.CharField(null=True, blank=True, max_length=250)
+
     def is_ohrwurm_supervisor(self, info, **kwargs):
         return self.groups.filter(name="ohrwurm-supervisor").exists()
-    
 
     # Custom save function
     def save(self, *args, **kwargs):

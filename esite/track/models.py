@@ -1,21 +1,15 @@
-from django.db import models
-from wagtail.search import index
+import graphene
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
-from wagtail.core.fields import StreamField
-from esite.utils.models import TimeStampMixin
-from .blocks import TagBlock, AttendeeBlock
-from modelcluster.models import ClusterableModel
-from modelcluster.fields import ParentalKey, ParentalManyToManyField
-from esite.bifrost.helpers import register_paginated_query_field
-from esite.bifrost.models import (
-    GraphQLCollection,
-    GraphQLForeignKey,
-    GraphQLImage,
-    GraphQLStreamfield,
-    GraphQLString,
+from graphql_jwt.decorators import (
+    login_required,
+    permission_required,
+    staff_member_required,
+    superuser_required,
 )
-from esite.utils.edit_handlers import ReadOnlyPanel
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
+from modelcluster.models import ClusterableModel
 from wagtail.admin.edit_handlers import (
     FieldPanel,
     FieldRowPanel,
@@ -25,21 +19,30 @@ from wagtail.admin.edit_handlers import (
     StreamFieldPanel,
     TabbedInterface,
 )
-import graphene
-from graphql_jwt.decorators import (
-    login_required,
-    permission_required,
-    staff_member_required,
-    superuser_required,
+from wagtail.core.fields import StreamField
+from wagtail.search import index
+
+from esite.bifrost.helpers import register_paginated_query_field
+from esite.bifrost.models import (
+    GraphQLCollection,
+    GraphQLForeignKey,
+    GraphQLImage,
+    GraphQLStreamfield,
+    GraphQLString,
 )
+from esite.utils.edit_handlers import ReadOnlyPanel
+from esite.utils.models import TimeStampMixin
+
+from .blocks import AttendeeBlock, TagBlock
 from .validators import validate_audio_file
 
-from django.contrib.auth import get_user_model
 
-
-@register_paginated_query_field("project_audio_channel", query_params={
-    "token": graphene.String(),
-})
+@register_paginated_query_field(
+    "project_audio_channel",
+    query_params={
+        "token": graphene.String(),
+    },
+)
 class ProjectAudioChannel(index.Indexed, ClusterableModel):
     title = models.CharField(null=True, blank=False, max_length=250)
     description = models.TextField(null=True, blank=True)
@@ -54,7 +57,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
     members = ParentalManyToManyField(
         get_user_model(), related_name="pacs", null=True, blank=True
     )
-    
+
     search_fields = [
         index.SearchField("title"),
         index.SearchField("created_at"),
@@ -98,7 +101,9 @@ class Track(index.Indexed, TimeStampMixin):
     audio_bitrate = models.CharField(null=True, blank=True, max_length=250)
     description = models.TextField(null=True, blank=True)
     tags = StreamField([("tag", TagBlock(required=True, icon="tag"))], blank=True)
-    attendees = StreamField([("attendee", AttendeeBlock(required=True, icon="user"))], blank=True)
+    attendees = StreamField(
+        [("attendee", AttendeeBlock(required=True, icon="user"))], blank=True
+    )
     transcript = models.TextField(null=True, blank=True)
     pac = ParentalKey(
         "ProjectAudioChannel", related_name="tracks", on_delete=models.CASCADE
@@ -127,7 +132,7 @@ class Track(index.Indexed, TimeStampMixin):
         index.SearchField("attendees"),
         index.SearchField("transcript"),
         index.FilterField("pac"),
-        index.FilterField('snekuser_id')
+        index.FilterField("snekuser_id"),
     ]
 
     panels = [
@@ -146,8 +151,12 @@ class Track(index.Indexed, TimeStampMixin):
     ]
 
     def audio_file_url(self, info, **kwargs):
-        return "%s%s" % (settings.BASE_URL, self.audio_file.url) if self.audio_file.name else None
-    
+        return (
+            "%s%s" % (settings.BASE_URL, self.audio_file.url)
+            if self.audio_file.name
+            else None
+        )
+
     def __str__(self):
         return f"{self.title}"
 
