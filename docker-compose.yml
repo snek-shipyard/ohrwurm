@@ -2,6 +2,18 @@ version: '3.1'
 
 services:
 
+#> Elasticsearch
+    es01:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+        container_name: es01
+        environment: 
+            - node.name=es01
+            - discovery.type=single-node
+            - action.auto_create_index=true
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+
 #> PostgreSQL
     db:
         image: postgres:12-alpine
@@ -23,6 +35,7 @@ services:
             - "50000:8000/tcp"
         depends_on:
             - "db"
+            - "es01"
 
 # SPDX-License-Identifier: (EUPL-1.2)
 # Copyright © 2019-2020 Simon Prast

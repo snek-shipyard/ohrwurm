@@ -247,7 +247,14 @@ WAGTAIL_SITE_NAME = "esite"
 # > Search Configuration
 # https://docs.wagtail.io/en/latest/topics/search/backends.html
 WAGTAILSEARCH_BACKENDS = {
-    "default": {"BACKEND": "wagtail.search.backends.db", "INDEX": "esite"}
+    'default': {
+        'BACKEND': 'wagtail.search.backends.elasticsearch7',
+        'URLS': ['http://es01:9200'],
+        'INDEX': 'esite',
+        'TIMEOUT': 5,
+        'OPTIONS': {},
+        'INDEX_SETTINGS': {},
+    }
 }
 
 # Custom document model

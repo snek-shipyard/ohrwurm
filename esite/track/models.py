@@ -43,7 +43,7 @@ from .validators import validate_audio_file
         "token": graphene.String(),
     },
 )
-class ProjectAudioChannel(index.Indexed, ClusterableModel):
+class ProjectAudioChannel(index.Indexed, ClusterableModel, TimeStampMixin):
     title = models.CharField(null=True, blank=False, max_length=250)
     description = models.TextField(null=True, blank=True)
     channel_id = models.CharField(null=True, blank=True, max_length=250)
@@ -62,7 +62,10 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
         index.SearchField("title"),
         index.SearchField("created_at"),
         index.SearchField("description"),
-        index.FilterField("snekuser_id"),
+        index.FilterField('snekuser_id'),
+        # index.RelatedFields('members', [
+        #     index.FilterField('id')
+        # ]),
     ]
 
     graphql_fields = [
@@ -72,6 +75,14 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
         GraphQLImage("avatar_image"),
         GraphQLCollection(GraphQLForeignKey, "members", get_user_model()),
     ]
+    
+    def snekuser_id(self):
+        """
+        Adds all of our Members' snekuser_ids to the search filter list.
+        Ref: https://www.thetopsites.net/article/58271827.shtml
+        """
+        return list(self.members.all().values_list('id', flat=True))
+
 
     def __str__(self):
         return f"{self.title}"
@@ -79,7 +90,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
     @classmethod
     @login_required
     def bifrost_queryset(cls, info, **kwargs):
-        return cls.objects.filter(members=info.context.user)
+        return info.context.user.pacs
 
 
 @register_paginated_query_field(
@@ -132,7 +143,7 @@ class Track(index.Indexed, TimeStampMixin):
         index.SearchField("attendees"),
         index.SearchField("transcript"),
         index.FilterField("pac"),
-        index.FilterField("snekuser_id"),
+        # index.FilterField("snekuser_id"),
     ]
 
     panels = [

@@ -7,6 +7,7 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from wagtail.search.index import class_is_indexed
 from wagtail.search.models import Query
 from wagtail.search.backends import get_search_backend
+from wagtail.search.utils import parse_query_string
 
 from .types.structures import BasePaginatedType, PaginationType
 
@@ -58,7 +59,7 @@ def resolve_queryset(
             query = Query.get(search_query)
             query.add_hit()
 
-        return get_search_backend().search(search_query, qs)
+        return get_search_backend().search(search_query, qs, fields=["title", "description"])
 
     if order is not None:
         qs = qs.order_by(*map(lambda x: x.strip(), order.split(",")))
@@ -142,7 +143,10 @@ def resolve_paginated_queryset(
         if settings.BIFROST_ADD_SEARCH_HIT is True:
             query = Query.get(search_query)
             query.add_hit()
-
+            
+        # filters, query = parse_query_string(search_query)
+        # print(filters, query)
+        print(search_query)
         results = get_search_backend().search(search_query, qs)
 
         return get_paginated_result(results, page, per_page)

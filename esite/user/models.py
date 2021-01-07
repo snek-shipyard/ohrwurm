@@ -14,6 +14,7 @@ from wagtail.admin.edit_handlers import (
     StreamFieldPanel,
     TabbedInterface,
 )
+from wagtail.search import index
 from wagtail.core.fields import RichTextField, StreamField
 from wagtail.snippets.edit_handlers import SnippetChooserPanel
 
@@ -34,7 +35,7 @@ from esite.bifrost.models import (
 
 
 # Extend AbstractUser Model from django.contrib.auth.models
-class SNEKUser(AbstractUser, ClusterableModel):
+class SNEKUser(AbstractUser, index.Indexed, ClusterableModel):
     username = models.CharField(
         "username",
         null=True,

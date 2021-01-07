@@ -62,11 +62,11 @@ if "GOOGLE_TAG_MANAGER_ID" in env:
 # > SSL Header
 # Used to detect secure connection proberly on Heroku.
 # See https://wagtail.io/blog/deploying-wagtail-heroku/
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "http")
 
 # > SSL Redirect
 # Every rquest gets redirected to HTTPS
-SECURE_SSL_REDIRECT = env.get("DJANGO_SECURE_SSL_REDIRECT", "off") == "on"
+SECURE_SSL_REDIRECT = env.get("DJANGO_SECURE_SSL_REDIRECT", "off") == "no"
 
 # > Allowed Hosts
 # Accept all hostnames, since we don't know in advance
@@ -96,7 +96,7 @@ CACHE_CONTROL_STALE_WHILE_REVALIDATE = int(
 # > Force HTTPS Redirect
 # https://docs.djangoproject.com/en/stable/ref/settings/#secure-ssl-redirect
 if env.get("SECURE_SSL_REDIRECT", "true").strip().lower() == "true":
-    SECURE_SSL_REDIRECT = True
+    SECURE_SSL_REDIRECT = False
 
 # This will allow the cache to swallow the fact that the website is behind TLS
 # and inform the Django using "X-Forwarded-Proto" HTTP header.
@@ -282,6 +282,8 @@ if "RECAPTCHA_PUBLIC_KEY" in env and "RECAPTCHA_PRIVATE_KEY" in env:
     NOCAPTCHA = True
     RECAPTCHA_PUBLIC_KEY = env["RECAPTCHA_PUBLIC_KEY"]
     RECAPTCHA_PRIVATE_KEY = env["RECAPTCHA_PRIVATE_KEY"]
+    
+    
 
 # SPDX-License-Identifier: (EUPL-1.2)
 # Copyright © 2019-2020 Simon Prast
