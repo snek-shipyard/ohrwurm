@@ -8,13 +8,18 @@ import modelcluster.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('track', '0002_projectaudiochannel_users'),
+        ("track", "0002_projectaudiochannel_users"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='projectaudiochannel',
-            name='users',
-            field=modelcluster.fields.ParentalManyToManyField(blank=True, null=True, related_name='tracks', to=settings.AUTH_USER_MODEL),
+            model_name="projectaudiochannel",
+            name="users",
+            field=modelcluster.fields.ParentalManyToManyField(
+                blank=True,
+                null=True,
+                related_name="tracks",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]
