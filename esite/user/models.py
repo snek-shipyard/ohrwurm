@@ -53,6 +53,10 @@ class SNEKUser(AbstractUser, ClusterableModel):
     telegram_user_id = models.CharField(
         null=True, blank=True, max_length=250
     )
+    
+    def is_ohrwurm_supervisor(self, info, **kwargs):
+        return self.groups.filter(name="ohrwurm-supervisor").exists()
+    
 
     # Custom save function
     def save(self, *args, **kwargs):
@@ -63,6 +67,7 @@ class SNEKUser(AbstractUser, ClusterableModel):
         MultiFieldPanel(
             [
                 FieldPanel("is_active"),
+                FieldPanel("password_changed"),
             ],
             "Settings",
         ),
@@ -77,6 +82,9 @@ class SNEKUser(AbstractUser, ClusterableModel):
     graphql_fields = [
         GraphQLString("username"),
         GraphQLBoolean("is_active"),
+        GraphQLBoolean("is_ohrwurm_supervisor"),
+        GraphQLBoolean("password_changed"),
+        GraphQLCollection(GraphQLForeignKey, "pacs", "track.ProjectAudioChannel"),
     ]
 
     def __str__(self):

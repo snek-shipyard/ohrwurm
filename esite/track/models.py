@@ -43,7 +43,7 @@ from django.contrib.auth import get_user_model
 class ProjectAudioChannel(index.Indexed, ClusterableModel):
     title = models.CharField(null=True, blank=False, max_length=250)
     description = models.TextField(null=True, blank=True)
-    channel_id = models.CharField(null=True, blank=False, max_length=250)
+    channel_id = models.CharField(null=True, blank=True, max_length=250)
     avatar_image = models.ForeignKey(
         settings.WAGTAILIMAGES_IMAGE_MODEL,
         null=True,
@@ -51,8 +51,8 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
         related_name="+",
         on_delete=models.SET_NULL,
     )
-    users = ParentalManyToManyField(
-        get_user_model(), related_name="tracks", null=True, blank=True
+    members = ParentalManyToManyField(
+        get_user_model(), related_name="pacs", null=True, blank=True
     )
     
     search_fields = [
@@ -67,7 +67,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
         GraphQLString("description"),
         GraphQLString("channel_id"),
         GraphQLImage("avatar_image"),
-        GraphQLCollection(GraphQLForeignKey, "users", get_user_model()),
+        GraphQLCollection(GraphQLForeignKey, "members", get_user_model()),
     ]
 
     def __str__(self):
@@ -76,7 +76,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
     @classmethod
     @login_required
     def bifrost_queryset(cls, info, **kwargs):
-        return cls.objects.filter(users=info.context.user)
+        return cls.objects.filter(members=info.context.user)
 
 
 @register_paginated_query_field(
@@ -84,7 +84,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
     query_params={
         "token": graphene.String(),
         "id": graphene.Int(),
-        "pac": graphene.Int(),
+        "pac": graphene.ID(),
     },
 )
 class Track(index.Indexed, TimeStampMixin):
@@ -154,7 +154,7 @@ class Track(index.Indexed, TimeStampMixin):
     @classmethod
     @login_required
     def bifrost_queryset(cls, info, **kwargs):
-        return cls.objects.filter(pac__users=info.context.user)
+        return cls.objects.filter(pac__members=info.context.user)
 
 
 # SPDX-License-Identifier: (EUPL-1.2)
