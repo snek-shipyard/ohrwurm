@@ -3,6 +3,7 @@ import os
 import time
 from .download_from_url import get_size, time_formatter
 
+
 async def progress(current, total, event, start):
     """Generic progress_callback for both
     upload.py and download.py"""
@@ -14,7 +15,7 @@ async def progress(current, total, event, start):
         elapsed_time = round(diff) * 1000
         time_to_completion = round((total - current) / speed) * 1000
         estimated_total_time = elapsed_time + time_to_completion
-        
+
         progress_str = f"""Yummy, Master gave sum juicy sound UwU
 **Downloading : {"%.2f" % (percentage)}%
 File Size:** {get_size(total)}
@@ -24,6 +25,7 @@ File Size:** {get_size(total)}
 **TTC:** {time_formatter(time_to_completion) or "0s"}"""
 
         await event.edit(progress_str)
+
 
 # SPDX-License-Identifier: (MIT)
 # Copyright (c) 2019 Pavithran

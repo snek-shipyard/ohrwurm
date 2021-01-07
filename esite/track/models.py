@@ -37,9 +37,12 @@ from .validators import validate_audio_file
 from django.contrib.auth import get_user_model
 
 
-@register_paginated_query_field("project_audio_channel", query_params={
-    "token": graphene.String(),
-})
+@register_paginated_query_field(
+    "project_audio_channel",
+    query_params={
+        "token": graphene.String(),
+    },
+)
 class ProjectAudioChannel(index.Indexed, ClusterableModel):
     title = models.CharField(null=True, blank=False, max_length=250)
     description = models.TextField(null=True, blank=True)
@@ -54,7 +57,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
     users = ParentalManyToManyField(
         get_user_model(), related_name="tracks", null=True, blank=True
     )
-    
+
     search_fields = [
         index.SearchField("title"),
         index.SearchField("created_at"),
@@ -98,7 +101,9 @@ class Track(index.Indexed, TimeStampMixin):
     audio_bitrate = models.CharField(null=True, blank=True, max_length=250)
     description = models.TextField(null=True, blank=True)
     tags = StreamField([("tag", TagBlock(required=True, icon="tag"))], blank=True)
-    attendees = StreamField([("attendee", AttendeeBlock(required=True, icon="user"))], blank=True)
+    attendees = StreamField(
+        [("attendee", AttendeeBlock(required=True, icon="user"))], blank=True
+    )
     transcript = models.TextField(null=True, blank=True)
     pac = ParentalKey(
         "ProjectAudioChannel", related_name="tracks", on_delete=models.CASCADE
@@ -127,7 +132,7 @@ class Track(index.Indexed, TimeStampMixin):
         index.SearchField("attendees"),
         index.SearchField("transcript"),
         index.FilterField("pac"),
-        index.FilterField('snekuser_id')
+        index.FilterField("snekuser_id"),
     ]
 
     panels = [
@@ -146,8 +151,12 @@ class Track(index.Indexed, TimeStampMixin):
     ]
 
     def audio_file_url(self, info, **kwargs):
-        return "%s%s" % (settings.BASE_URL, self.audio_file.url) if self.audio_file.name else None
-    
+        return (
+            "%s%s" % (settings.BASE_URL, self.audio_file.url)
+            if self.audio_file.name
+            else None
+        )
+
     def __str__(self):
         return f"{self.title}"
 

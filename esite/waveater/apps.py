@@ -20,6 +20,7 @@ from pydub import AudioSegment
 
 from asgiref.sync import sync_to_async
 
+
 @sync_to_async
 def _handel_incoming_audio(chat_id, chat_title, track_title, track_audio_file, chat_description=None, tags=None, attendees=None, transcript=None):
     from esite.track.models import Track, ProjectAudioChannel
@@ -183,6 +184,7 @@ class Waveater():
 
         with client:
             client.run_until_disconnected()
+
 
 # SPDX-License-Identifier: (EUPL-1.2)
 # Copyright © 2020 miraculix-org Florian Kleber
