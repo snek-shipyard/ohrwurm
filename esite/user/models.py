@@ -49,45 +49,19 @@ class SNEKUser(AbstractUser, ClusterableModel):
         unique=True,
         validators=[django.contrib.auth.validators.UnicodeUsernameValidator()],
     )
+    password_changed = models.BooleanField(default=False)
     telegram_user_id = models.CharField(
-        null=True, blank=True, unique=True, max_length=250
+        null=True, blank=True, max_length=250
     )
 
     # Custom save function
     def save(self, *args, **kwargs):
-        if not self.username:
-            self.username = str(uuid.uuid4())
-
-        if not self.is_staff:
-            if not self.is_active:
-                self.is_active = True
-
-                send_mail(
-                    "got activated",
-                    "You got activated.",
-                    "noreply@snek.at",
-                    [self.email],
-                    fail_silently=False,
-                )
-
-        else:
-            self.is_active = False
-
         super(SNEKUser, self).save(*args, **kwargs)
 
     panels = [
         FieldPanel("username"),
         MultiFieldPanel(
             [
-                FieldPanel("first_name"),
-                FieldPanel("last_name"),
-                FieldPanel("email"),
-            ],
-            "Information",
-        ),
-        MultiFieldPanel(
-            [
-                FieldPanel("is_staff"),
                 FieldPanel("is_active"),
             ],
             "Settings",
@@ -102,9 +76,6 @@ class SNEKUser(AbstractUser, ClusterableModel):
 
     graphql_fields = [
         GraphQLString("username"),
-        GraphQLString("first_name"),
-        GraphQLString("last_name"),
-        GraphQLString("email"),
         GraphQLBoolean("is_active"),
     ]
 
