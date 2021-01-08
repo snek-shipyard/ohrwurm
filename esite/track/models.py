@@ -1,21 +1,15 @@
-from django.db import models
-from wagtail.search import index
+import graphene
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
-from wagtail.core.fields import StreamField
-from esite.utils.models import TimeStampMixin
-from .blocks import TagBlock, AttendeeBlock
-from modelcluster.models import ClusterableModel
-from modelcluster.fields import ParentalKey, ParentalManyToManyField
-from esite.bifrost.helpers import register_paginated_query_field
-from esite.bifrost.models import (
-    GraphQLCollection,
-    GraphQLForeignKey,
-    GraphQLImage,
-    GraphQLStreamfield,
-    GraphQLString,
+from graphql_jwt.decorators import (
+    login_required,
+    permission_required,
+    staff_member_required,
+    superuser_required,
 )
-from esite.utils.edit_handlers import ReadOnlyPanel
+from modelcluster.fields import ParentalKey, ParentalManyToManyField
+from modelcluster.models import ClusterableModel
 from wagtail.admin.edit_handlers import (
     FieldPanel,
     FieldRowPanel,
@@ -25,16 +19,22 @@ from wagtail.admin.edit_handlers import (
     StreamFieldPanel,
     TabbedInterface,
 )
-import graphene
-from graphql_jwt.decorators import (
-    login_required,
-    permission_required,
-    staff_member_required,
-    superuser_required,
-)
-from .validators import validate_audio_file
+from wagtail.core.fields import StreamField
+from wagtail.search import index
 
-from django.contrib.auth import get_user_model
+from esite.bifrost.helpers import register_paginated_query_field
+from esite.bifrost.models import (
+    GraphQLCollection,
+    GraphQLForeignKey,
+    GraphQLImage,
+    GraphQLStreamfield,
+    GraphQLString,
+)
+from esite.utils.edit_handlers import ReadOnlyPanel
+from esite.utils.models import TimeStampMixin
+
+from .blocks import AttendeeBlock, TagBlock
+from .validators import validate_audio_file
 
 
 @register_paginated_query_field(
@@ -46,7 +46,7 @@ from django.contrib.auth import get_user_model
 class ProjectAudioChannel(index.Indexed, ClusterableModel):
     title = models.CharField(null=True, blank=False, max_length=250)
     description = models.TextField(null=True, blank=True)
-    channel_id = models.CharField(null=True, blank=False, max_length=250)
+    channel_id = models.CharField(null=True, blank=True, max_length=250)
     avatar_image = models.ForeignKey(
         settings.WAGTAILIMAGES_IMAGE_MODEL,
         null=True,
@@ -54,8 +54,8 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
         related_name="+",
         on_delete=models.SET_NULL,
     )
-    users = ParentalManyToManyField(
-        get_user_model(), related_name="tracks", null=True, blank=True
+    members = ParentalManyToManyField(
+        get_user_model(), related_name="pacs", null=True, blank=True
     )
 
     search_fields = [
@@ -70,7 +70,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
         GraphQLString("description"),
         GraphQLString("channel_id"),
         GraphQLImage("avatar_image"),
-        GraphQLCollection(GraphQLForeignKey, "users", get_user_model()),
+        GraphQLCollection(GraphQLForeignKey, "members", get_user_model()),
     ]
 
     def __str__(self):
@@ -79,7 +79,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
     @classmethod
     @login_required
     def bifrost_queryset(cls, info, **kwargs):
-        return cls.objects.filter(users=info.context.user)
+        return cls.objects.filter(members=info.context.user)
 
 
 @register_paginated_query_field(
@@ -87,7 +87,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
     query_params={
         "token": graphene.String(),
         "id": graphene.Int(),
-        "pac": graphene.Int(),
+        "pac": graphene.ID(),
     },
 )
 class Track(index.Indexed, TimeStampMixin):
@@ -163,7 +163,7 @@ class Track(index.Indexed, TimeStampMixin):
     @classmethod
     @login_required
     def bifrost_queryset(cls, info, **kwargs):
-        return cls.objects.filter(pac__users=info.context.user)
+        return cls.objects.filter(pac__members=info.context.user)
 
 
 # SPDX-License-Identifier: (EUPL-1.2)

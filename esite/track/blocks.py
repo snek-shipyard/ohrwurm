@@ -1,8 +1,8 @@
 from wagtail.core import blocks
+
 from esite.bifrost.helpers import register_streamfield_block
-from esite.bifrost.models import (
-    GraphQLString,
-)
+from esite.bifrost.models import GraphQLString
+
 
 
 @register_streamfield_block

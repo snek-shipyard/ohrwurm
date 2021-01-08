@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-
 from wagtail.contrib.modeladmin.options import (
     ModelAdmin,
     ModelAdminGroup,

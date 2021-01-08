@@ -1,3 +1,5 @@
+from esite.track.schema import AddPACMember, AddTrack, DeletePACMember, AddPAC, DeletePAC, DeleteTrack, UpdatePAC, UpdateTrack
+from esite.user.schema import AddOhrwurmMember, ChangePassword, DeleteOhrwurmMember, UpdateOhrwurmMember
 from django.conf import settings
 
 # django
@@ -56,6 +58,18 @@ def create_schema():
             "verify_token": graphql_jwt.Verify.Field(),
             "refresh_token": graphql_jwt.Refresh.Field(),
             "revoke_token": graphql_jwt.Revoke.Field(),
+            "add_ohrwurm_member": AddOhrwurmMember.Field(),
+            "delete_ohrwurm_member": DeleteOhrwurmMember.Field(),
+            "update_ohrwurm_member": UpdateOhrwurmMember.Field(),
+            "change_password": ChangePassword.Field(),
+            "add_pac_member": AddPACMember.Field(),
+            "delete_pac_member": DeletePACMember.Field(),
+            "add_pac": AddPAC.Field(),
+            "delete_pac": DeletePAC.Field(),
+            "update_pac": UpdatePAC.Field(),
+            "add_track": AddTrack.Field(),
+            "delete_track": DeleteTrack.Field(),
+            "update_track": UpdateTrack.Field(),
         }
 
         dict_params.update(

@@ -1,13 +1,9 @@
-import json
-import uuid
-
 import django.contrib.auth.validators
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.core.mail import send_mail
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-
 from modelcluster.models import ClusterableModel
 from wagtail.admin.edit_handlers import (
     FieldPanel,
@@ -49,46 +45,22 @@ class SNEKUser(AbstractUser, ClusterableModel):
         unique=True,
         validators=[django.contrib.auth.validators.UnicodeUsernameValidator()],
     )
-    telegram_user_id = models.CharField(
-        null=True, blank=True, unique=True, max_length=250
-    )
+    password_changed = models.BooleanField(default=False)
+    telegram_user_id = models.CharField(null=True, blank=True, max_length=250)
+
+    def is_ohrwurm_supervisor(self, info, **kwargs):
+        return self.groups.filter(name="ohrwurm-supervisor").exists()
 
     # Custom save function
     def save(self, *args, **kwargs):
-        if not self.username:
-            self.username = str(uuid.uuid4())
-
-        if not self.is_staff:
-            if not self.is_active:
-                self.is_active = True
-
-                send_mail(
-                    "got activated",
-                    "You got activated.",
-                    "noreply@snek.at",
-                    [self.email],
-                    fail_silently=False,
-                )
-
-        else:
-            self.is_active = False
-
         super(SNEKUser, self).save(*args, **kwargs)
 
     panels = [
         FieldPanel("username"),
         MultiFieldPanel(
             [
-                FieldPanel("first_name"),
-                FieldPanel("last_name"),
-                FieldPanel("email"),
-            ],
-            "Information",
-        ),
-        MultiFieldPanel(
-            [
-                FieldPanel("is_staff"),
                 FieldPanel("is_active"),
+                FieldPanel("password_changed"),
             ],
             "Settings",
         ),
@@ -102,10 +74,10 @@ class SNEKUser(AbstractUser, ClusterableModel):
 
     graphql_fields = [
         GraphQLString("username"),
-        GraphQLString("first_name"),
-        GraphQLString("last_name"),
-        GraphQLString("email"),
         GraphQLBoolean("is_active"),
+        GraphQLBoolean("is_ohrwurm_supervisor"),
+        GraphQLBoolean("password_changed"),
+        GraphQLCollection(GraphQLForeignKey, "pacs", "track.ProjectAudioChannel"),
     ]
 
     def __str__(self):
