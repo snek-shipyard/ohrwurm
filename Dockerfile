@@ -44,6 +44,7 @@ RUN echo "## Installing base ##" && \
         libjpeg-turbo-dev \
         zlib-dev \
         expat-dev \
+	libffi-dev \
 	;\
     apk add --force \
 		git@main \
