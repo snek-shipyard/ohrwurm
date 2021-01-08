@@ -2,7 +2,9 @@
 import os
 import sys
 
-if os.environ.get("RUN_MAIN", None) != "true" and 'manage.py' not in sys.argv:
+if os.environ.get("RUN_MAIN", None) != "true" and (
+    "manage.py" not in sys.argv or "runserver" in sys.argv
+):
     os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
     default_app_config = "esite.waveater.apps.WaveaterConfig"
 
