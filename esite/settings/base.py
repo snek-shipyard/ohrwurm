@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "esite.colorfield",
     "esite.home",
     "esite.track",
+    "esite.waveater",
     # Django core apps
     "django.contrib.admin",
     "django.contrib.auth",

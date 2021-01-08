@@ -4,6 +4,7 @@ from esite.bifrost.helpers import register_streamfield_block
 from esite.bifrost.models import GraphQLString
 
 
+
 @register_streamfield_block
 class TagBlock(blocks.StructBlock):
     SIGNIFICANCE_CHOICES = [
