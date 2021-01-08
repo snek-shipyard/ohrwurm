@@ -73,7 +73,7 @@ class Waveater:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         client = TelegramClient(
-            None, settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH, loop=loop
+            "client", settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH, loop=loop
         ).start(bot_token=settings.TELEGRAM_BOT_TOKEN)
 
         @client.on(events.NewMessage(pattern="/start"))
