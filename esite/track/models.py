@@ -29,6 +29,7 @@ from esite.bifrost.models import (
     GraphQLImage,
     GraphQLStreamfield,
     GraphQLString,
+    GraphqlDatetime,
 )
 from esite.utils.edit_handlers import ReadOnlyPanel
 from esite.utils.models import TimeStampMixin
@@ -66,7 +67,7 @@ class ProjectAudioChannel(index.Indexed, ClusterableModel):
     ]
 
     graphql_fields = [
-        GraphQLString("title"),
+        GraphQLString("title", required=True),
         GraphQLString("description"),
         GraphQLString("channel_id"),
         GraphQLImage("avatar_image"),
@@ -110,8 +111,8 @@ class Track(index.Indexed, TimeStampMixin):
     )
 
     graphql_fields = [
-        GraphQLString("title"),
-        GraphQLString("created_at"),
+        GraphQLString("title", required=True),
+        GraphqlDatetime("created_at", required=True),
         GraphQLString("audio_file_url"),
         GraphQLString("audio_channel"),
         GraphQLString("audio_format"),
