@@ -3,10 +3,14 @@ import os
 import io
 import logging
 import json
+import hashlib
+import uuid
 
 from django.conf import settings
 from django.apps import AppConfig
 from django.core.files import File
+# from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
 
 from telethon import TelegramClient, events, functions
 from .file_handler import progress
@@ -17,12 +21,45 @@ import asyncio
 import threading
 
 from pydub import AudioSegment
-
+from pydub.silence import split_on_silence
+import speech_recognition as sr
 from asgiref.sync import sync_to_async
 
 
+recognizer = sr.Recognizer()
+
+
+def load_chunks(audio_in):
+    audio_chunks = split_on_silence(audio_in, min_silence_len=1800, silence_thresh=-17)
+
+    if audio_chunks:
+        return audio_chunks
+    else:
+        return [
+            audio_in,
+        ]
+
+
 @sync_to_async
-def _audio_to_db(
+def transcribe_audio(audio_in):
+    for audio_chunk in load_chunks(audio_in):
+        audio_chunk.export("temp", format="wav")
+
+        with sr.AudioFile("temp") as source:
+            audio = recognizer.listen(source)
+
+            try:
+                transcript = recognizer.recognize_google(
+                    audio, language="de-AT", show_all=True
+                )
+                return transcript
+            except Exception as ex:
+                print("Error occured")
+                print(ex)
+
+
+@sync_to_async
+def _audio_to_ow(
     chat_id,
     chat_title,
     track_audio_file,
@@ -53,6 +90,22 @@ def _audio_to_db(
         ),
         transcript=transcript,
     )
+
+    if created:
+        # pac has been created
+        slavename = f"slave-{uuid.uuid4()}"
+        password = get_user_model().objects.make_random_password()
+
+        member = get_user_model().objects.create(username=slavename, is_active=True)
+        member.set_password(hashlib.sha256(str.encode(password)).hexdigest())
+
+        member.groups.add(Group.objects.get(name="ohrwurm-supervisor"))
+        member.groups.add(Group.objects.get(name="ohrwurm-member"))
+
+        member.pacs.add(pac)
+        member.save()
+
+        return f"Thx for joining Ohrwurm\nSlavename: {slavename}\nPassword: {password}"
 
 
 class WaveaterConfig(AppConfig):
@@ -129,6 +182,7 @@ class Waveater:
                     if event.message.file.mime_type == "audio/x-wav":
                         """Create autosegment from wav"""
                         audio_seg = AudioSegment.from_wav(audio_in)
+
                     elif (
                         event.message.file.mime_type == "audio/x-mpeg3" or "audio/mpeg3"
                     ):
@@ -210,14 +264,18 @@ class Waveater:
                     elif hasattr(event._chat, "username"):
                         chat_title = f"User: {event._chat.username}"
 
-                    await _audio_to_db(
+                    owmsg = await _audio_to_ow(
                         chat_id=event._chat.id,
                         chat_title=chat_title,
                         chat_description=chat_description,
                         track_audio_file=audio_out,
                         tags=tags,
                         attendees=attendees,
+                        transcript=await transcribe_audio(audio_seg),
                     )
+
+                    if owmsg:
+                        await client.send_message(event._chat.id, owmsg)
 
             except Exception as e:
                 print(e)
