@@ -20,3 +20,4 @@ wagtail-headless-preview==0.1.4
 telethon==1.18.2
 pydub==0.24.1
 graphene-file-upload==1.2.2
+SpeechRecognition==3.8.1
