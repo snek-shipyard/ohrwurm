@@ -9,7 +9,6 @@ import uuid
 from django.conf import settings
 from django.apps import AppConfig
 from django.core.files import File
-# from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 
 from telethon import TelegramClient, events, functions
@@ -68,7 +67,9 @@ def _audio_to_ow(
     attendees=None,
     transcript=None,
 ):
+    from django.contrib.auth.models import Group
     from esite.track.models import Track, ProjectAudioChannel
+    
 
     pac, created = ProjectAudioChannel.objects.update_or_create(
         channel_id=chat_id,
